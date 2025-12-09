@@ -84,7 +84,7 @@
 
     // Save bounties to localStorage whenever they change
     useEffect(() => {
-      if (isHydrated && bounties.length > 0) {
+      if (isHydrated) {
         localStorage.setItem('intuition-bounties', JSON.stringify(bounties))
         console.log('💾 Saved bounties to localStorage:', bounties.length)
       }
@@ -92,7 +92,7 @@
 
     // Save submissions to localStorage whenever they change
     useEffect(() => {
-      if (isHydrated && submissions.length > 0) {
+      if (isHydrated) {
         // Convert BigInt to strings for JSON serialization
         const submissionsForStorage = submissions.map(sub => ({
           ...sub,
