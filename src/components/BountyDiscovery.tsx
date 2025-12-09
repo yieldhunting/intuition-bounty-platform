@@ -225,9 +225,13 @@
                       <h3 className="text-lg font-semibold text-blue-400">
                         {bounty.title}
                       </h3>
-                      {isReputationBounty && (
+                      {isReputationBounty ? (
                         <span className="text-xs bg-purple-600 text-purple-100 px-2 py-0.5 rounded">
                           🏆 Reputation
+                        </span>
+                      ) : (
+                        <span className="text-xs bg-blue-600 text-blue-100 px-2 py-0.5 rounded">
+                          📊 Data
                         </span>
                       )}
                     </div>
