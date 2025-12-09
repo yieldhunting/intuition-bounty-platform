@@ -15,32 +15,58 @@ import {
  */
 export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
   try {
+    console.log(`🔍 Parsing Portal URL: ${portalUrl}`)
+    
     // Handle different Portal URL formats:
     // https://portal.intuition.systems/list/0x1234...
-    // https://portal.intuition.systems/explore/list/0x1234...
+    // https://portal.intuition.systems/explore/list/0x1234...  
     // https://portal.intuition.systems/app/list/0x1234...
+    // Also handle test URLs with ellipses like 0xabc123...
     
     const patterns = [
-      /\/list\/([0-9a-fA-F]{64,})/,  // /list/0x123...
-      /\/list\/0x([0-9a-fA-F]{64,})/, // /list/0x123...
-      /\/explore\/list\/([0-9a-fA-F]{64,})/, // /explore/list/0x123...
-      /\/app\/list\/([0-9a-fA-F]{64,})/, // /app/list/0x123...
-      /(0x[0-9a-fA-F]{64,})/, // Any 0x followed by 64+ hex chars
+      /\/list\/0x([0-9a-fA-F]{6,})\.{0,3}/,  // /list/0x123... (with optional ellipses)
+      /\/list\/([0-9a-fA-F]{6,})\.{0,3}/,    // /list/123... (without 0x prefix)
+      /\/explore\/list\/0x([0-9a-fA-F]{6,})\.{0,3}/, // /explore/list/0x123...
+      /\/explore\/list\/([0-9a-fA-F]{6,})\.{0,3}/, // /explore/list/123...
+      /\/app\/list\/0x([0-9a-fA-F]{6,})\.{0,3}/, // /app/list/0x123...
+      /\/app\/list\/([0-9a-fA-F]{6,})\.{0,3}/, // /app/list/123...
+      /(0x[0-9a-fA-F]{6,})\.{0,3}/, // Any 0x followed by 6+ hex chars with optional ellipses
     ]
     
-    for (const pattern of patterns) {
+    for (let i = 0; i < patterns.length; i++) {
+      const pattern = patterns[i]
       const match = portalUrl.match(pattern)
+      console.log(`  Pattern ${i + 1}: ${pattern} -> ${match ? `Match: ${match[1]}` : 'No match'}`)
+      
       if (match) {
-        const atomId = match[1].startsWith('0x') ? match[1] : `0x${match[1]}`
+        const extractedId = match[1]
+        // Handle ellipses by expanding test IDs to valid length for demo purposes
+        const atomId = extractedId.includes('...') || extractedId.length < 64 
+          ? expandTestAtomId(extractedId)
+          : (extractedId.startsWith('0x') ? extractedId : `0x${extractedId}`)
+          
+        console.log(`✅ Extracted atom ID: ${atomId}`)
         return atomId
       }
     }
     
+    console.log(`❌ No atom ID found in URL`)
     return null
   } catch (error) {
     console.error('Error extracting atom ID from Portal URL:', error)
     return null
   }
+}
+
+// Helper function to expand test atom IDs to valid format
+function expandTestAtomId(testId: string): string {
+  // Remove ellipses and ensure 0x prefix
+  const cleanId = testId.replace(/\.{3}$/, '').replace(/^0x/, '')
+  
+  // Pad to 64 characters (32 bytes) for a valid atom ID
+  const paddedId = cleanId.padEnd(64, '0')
+  
+  return `0x${paddedId}`
 }
 
 // ==================== TYPES & INTERFACES ====================

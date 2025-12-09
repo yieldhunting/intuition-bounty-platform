@@ -60,7 +60,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
         bountyTitle: 'Flight Delay Dataset Analysis',
         bountyReward: 100,
         submitterAddress: '0x1234567890123456789012345678901234567890',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0x7ec36d...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0x7ec36d567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
         forStake: BigInt('45000000000000000000'), // 45 tTRUST
         againstStake: BigInt('55000000000000000000'), // 55 tTRUST
@@ -74,7 +74,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
         bountyTitle: 'Social Media Sentiment Dataset',
         bountyReward: 75,
         submitterAddress: '0x9876543210987654321098765432109876543210',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0x4ba82f...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0x4ba82f567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         submittedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
         forStake: BigInt('35000000000000000000'), // 35 tTRUST
         againstStake: BigInt('40000000000000000000'), // 40 tTRUST

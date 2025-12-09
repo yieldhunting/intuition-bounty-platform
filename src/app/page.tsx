@@ -21,7 +21,7 @@
         id: 'sub_001',
         bountyId: 'bounty_001',
         submitterAddress: '0x1234567890123456789012345678901234567890',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xabc123...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xabc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         submittedAt: new Date().toISOString(),
         forStake: BigInt('75000000000000000000'), // 75 tTRUST
         againstStake: BigInt('25000000000000000000'), // 25 tTRUST
@@ -32,7 +32,7 @@
         id: 'sub_002', 
         bountyId: 'bounty_002',
         submitterAddress: '0x9876543210987654321098765432109876543210',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xdef456...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xdef4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
         submittedAt: new Date().toISOString(),
         forStake: BigInt('40000000000000000000'), // 40 tTRUST
         againstStake: BigInt('60000000000000000000'), // 60 tTRUST

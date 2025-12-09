@@ -82,7 +82,7 @@ export function AutomatedResolution({ isSystemAdmin = false }: AutomatedResoluti
         bountyTitle: 'Climate Data Analysis',
         bountyReward: 150,
         submitterAddress: '0x1111111111111111111111111111111111111111',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xabc123...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xabc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         forStake: BigInt('80000000000000000000'), // 80 tTRUST (80%)
         againstStake: BigInt('20000000000000000000'), // 20 tTRUST (20%)
         stakingPeriodEnd: new Date(Date.now() - 1 * 60 * 60 * 1000), // 1 hour ago
@@ -95,7 +95,7 @@ export function AutomatedResolution({ isSystemAdmin = false }: AutomatedResoluti
         bountyTitle: 'Market Trends Dataset',
         bountyReward: 200,
         submitterAddress: '0x2222222222222222222222222222222222222222',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xdef456...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xdef4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
         forStake: BigInt('25000000000000000000'), // 25 tTRUST (25%)
         againstStake: BigInt('75000000000000000000'), // 75 tTRUST (75%)
         stakingPeriodEnd: new Date(Date.now() - 30 * 60 * 1000), // 30 mins ago
@@ -108,7 +108,7 @@ export function AutomatedResolution({ isSystemAdmin = false }: AutomatedResoluti
         bountyTitle: 'Financial Reports Collection',
         bountyReward: 120,
         submitterAddress: '0x3333333333333333333333333333333333333333',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xghi789...',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xghi7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
         forStake: BigInt('52000000000000000000'), // 52 tTRUST (52%)
         againstStake: BigInt('48000000000000000000'), // 48 tTRUST (48%)
         stakingPeriodEnd: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
