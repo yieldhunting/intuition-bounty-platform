@@ -42,6 +42,7 @@ const nextConfig = {
       "tap": false,
       "worker_threads": false,
       "why-is-node-running": false,
+      "pino-elasticsearch": false,
     }
 
     // Ignore all warnings and errors
@@ -53,6 +54,7 @@ const nextConfig = {
       /node_modules.*viem.*test/,
       /Can't resolve.*tap/,
       /Can't resolve.*pino-pretty/,
+      /Can't resolve.*pino-elasticsearch/,
       /Can't resolve.*@react-native-async-storage/,
       /Can't resolve.*worker_threads/,
       /Can't resolve.*why-is-node-running/,
