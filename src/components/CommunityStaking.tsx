@@ -7,6 +7,7 @@ import { StakingManager, StakePosition, ESCROW_CONSTANTS, SubmissionStatus } fro
 interface Submission {
   id: string
   bountyId: string
+  bountyTitle: string // Add bounty title to display
   submitterAddress: string
   portalUrl: string
   submittedAt: string
@@ -17,13 +18,11 @@ interface Submission {
 }
 
 interface CommunityStakingProps {
-  bountyId: string
-  bountyTitle: string
   submissions: Submission[]
   onStakeUpdate?: (submissionId: string, forStake: bigint, againstStake: bigint) => void
 }
 
-export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUpdate }: CommunityStakingProps) {
+export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakingProps) {
   const { address, isConnected, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
@@ -163,7 +162,7 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
       <div className="flex items-center gap-3 mb-6">
         <h3 className="text-xl font-semibold text-white">Community Validation</h3>
         <div className="text-sm text-gray-400">
-          📊 Stake to validate solutions
+          📊 Validate solutions across all bounties
         </div>
       </div>
 
@@ -201,7 +200,7 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm text-gray-400">Submission:</span>
+                        <span className="text-lg font-medium text-white">{submission.bountyTitle}</span>
                         {submission.isLocal && (
                           <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-0.5 rounded">
                             Local
@@ -213,6 +212,7 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
                           </span>
                         )}
                       </div>
+                      <p className="text-sm text-gray-400 mb-2">Solution Portal URL:</p>
                       <a
                         href={submission.portalUrl}
                         target="_blank"
@@ -221,8 +221,8 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
                       >
                         {submission.portalUrl}
                       </a>
-                      <p className="text-xs text-gray-400 mt-1">
-                        By: {submission.submitterAddress.slice(0, 10)}... • {new Date(submission.submittedAt).toLocaleDateString()}
+                      <p className="text-xs text-gray-400 mt-2">
+                        Submitted by: {submission.submitterAddress.slice(0, 10)}... • {new Date(submission.submittedAt).toLocaleDateString()}
                       </p>
                     </div>
 

@@ -17,7 +17,31 @@
     reputationCriteria?: string
   }
 
-  export function CreateBounty() {
+  interface Bounty {
+    id: string
+    title: string
+    description: string
+    reward: number
+    deadline: string
+    category: string
+    creator: string
+    creatorAddress: string
+    submissions: number
+    totalStake: number
+    atomId: string
+    transactionHash: string
+    createdAt: string
+    bountyType?: 'data' | 'reputation'
+    targetAtom?: string
+    expertiseRequired?: string
+    reputationCriteria?: string
+  }
+
+  interface CreateBountyProps {
+    onBountyCreated?: (bounty: Bounty) => void
+  }
+
+  export function CreateBounty({ onBountyCreated }: CreateBountyProps) {
     const { isConnected, chainId, address } = useAccount()
     const { data: walletClient } = useWalletClient()
     const publicClient = usePublicClient()
@@ -123,15 +147,32 @@
           bountyString
         )
 
-        // Set created bounty for escrow setup
-        setCreatedBounty({
+        // Create bounty object
+        const newBounty: Bounty = {
           id: bountyResult.state.termId,
           title: formData.title,
           description: formData.description,
           reward: parseFloat(formData.reward),
           deadline: formData.deadline,
-          transactionHash: bountyResult.transactionHash
-        })
+          category: formData.bountyType === 'reputation' ? 'Reputation' : 'Data Collection',
+          creator: address?.slice(0, 10) + '...' || 'Anonymous',
+          creatorAddress: address || '',
+          submissions: 0,
+          totalStake: 0,
+          atomId: bountyResult.state.termId,
+          transactionHash: bountyResult.transactionHash,
+          createdAt: new Date().toISOString(),
+          bountyType: formData.bountyType,
+          targetAtom: formData.targetAtomId,
+          expertiseRequired: formData.expertiseRequired,
+          reputationCriteria: formData.reputationCriteria
+        }
+
+        // Set created bounty for escrow setup
+        setCreatedBounty(newBounty)
+        
+        // Notify parent component
+        onBountyCreated?.(newBounty)
 
         setResult(`✅ Bounty created successfully! 
           Bounty ID: ${bountyResult.state.termId}

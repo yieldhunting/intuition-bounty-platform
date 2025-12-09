@@ -11,39 +11,68 @@
   import { AutomatedResolution } from '@/components/AutomatedResolution'
   import { ReputationSystem } from '@/components/ReputationSystem'
 
+  interface Bounty {
+    id: string
+    title: string
+    description: string
+    reward: number
+    deadline: string
+    category: string
+    creator: string
+    creatorAddress: string
+    submissions: number
+    totalStake: number
+    atomId: string
+    transactionHash: string
+    createdAt: string
+    bountyType?: 'data' | 'reputation'
+    targetAtom?: string
+    expertiseRequired?: string
+    reputationCriteria?: string
+  }
+
+  interface Submission {
+    id: string
+    bountyId: string
+    bountyTitle: string // Add bounty title for display
+    submitterAddress: string
+    portalUrl: string
+    submittedAt: string
+    forStake: bigint
+    againstStake: bigint
+    status: SubmissionStatus
+    isLocal?: boolean
+  }
+
   export default function Home() {
     const [activeTab, setActiveTab] = useState('discover')
     const { address } = useAccount()
 
-    // Mock data for community staking component (stateful)
-    const [mockSubmissions, setMockSubmissions] = useState([
-      {
-        id: 'sub_001',
-        bountyId: 'bounty_001',
-        submitterAddress: '0x1234567890123456789012345678901234567890',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xabc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-        submittedAt: new Date().toISOString(),
-        forStake: BigInt('75000000000000000000'), // 75 tTRUST
-        againstStake: BigInt('25000000000000000000'), // 25 tTRUST
-        status: SubmissionStatus.STAKING_PERIOD,
-        isLocal: false
-      },
-      {
-        id: 'sub_002', 
-        bountyId: 'bounty_002',
-        submitterAddress: '0x9876543210987654321098765432109876543210',
-        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0xdef4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12',
-        submittedAt: new Date().toISOString(),
-        forStake: BigInt('40000000000000000000'), // 40 tTRUST
-        againstStake: BigInt('60000000000000000000'), // 60 tTRUST
-        status: SubmissionStatus.STAKING_PERIOD,
-        isLocal: true
+    // Real state management for bounties and submissions
+    const [bounties, setBounties] = useState<Bounty[]>([])
+    const [submissions, setSubmissions] = useState<Submission[]>([])
+
+    // Handler for adding a new bounty
+    const handleBountyCreated = (bounty: Bounty) => {
+      setBounties(prev => [bounty, ...prev])
+    }
+
+    // Handler for adding a new submission
+    const handleSubmissionCreated = (submission: Omit<Submission, 'bountyTitle'>, bountyId: string) => {
+      const bounty = bounties.find(b => b.id === bountyId)
+      const submissionWithBountyTitle: Submission = {
+        ...submission,
+        bountyTitle: bounty?.title || 'Unknown Bounty',
+        forStake: BigInt(0),
+        againstStake: BigInt(0),
+        status: SubmissionStatus.STAKING_PERIOD
       }
-    ])
+      setSubmissions(prev => [submissionWithBountyTitle, ...prev])
+    }
 
     // Handler for updating submission stakes
     const handleStakeUpdate = (submissionId: string, newForStake: bigint, newAgainstStake: bigint) => {
-      setMockSubmissions(prev => 
+      setSubmissions(prev => 
         prev.map(submission => 
           submission.id === submissionId 
             ? { ...submission, forStake: newForStake, againstStake: newAgainstStake }
@@ -158,13 +187,20 @@
 
           {/* Tab Content */}
           <div className="mb-8">
-            {activeTab === 'discover' && <BountyDiscovery />}
-            {activeTab === 'create' && <CreateBounty />}
+            {activeTab === 'discover' && (
+              <BountyDiscovery 
+                bounties={bounties}
+                onSubmissionCreated={handleSubmissionCreated}
+              />
+            )}
+            {activeTab === 'create' && (
+              <CreateBounty 
+                onBountyCreated={handleBountyCreated}
+              />
+            )}
             {activeTab === 'community' && (
               <CommunityStaking 
-                bountyId="demo_bounty_001"
-                bountyTitle="Climate Data Analysis"
-                submissions={mockSubmissions}
+                submissions={submissions}
                 onStakeUpdate={handleStakeUpdate}
               />
             )}

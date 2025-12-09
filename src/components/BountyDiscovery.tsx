@@ -26,8 +26,13 @@
     reputationCriteria?: string
   }
 
-  export function BountyDiscovery() {
-    const [bounties, setBounties] = useState<Bounty[]>([])
+  interface BountyDiscoveryProps {
+    bounties: Bounty[]
+    onSubmissionCreated?: (submission: any, bountyId: string) => void
+  }
+
+  export function BountyDiscovery({ bounties: propBounties, onSubmissionCreated }: BountyDiscoveryProps) {
+    const [graphqlBounties, setGraphqlBounties] = useState<Bounty[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string>('')
     const [filter, setFilter] = useState('all')
@@ -49,6 +54,9 @@
       bountyTitle: '',
       bountyType: 'data'
     })
+
+    // Combine GraphQL bounties with locally created bounties
+    const allBounties = [...propBounties, ...graphqlBounties]
 
     // Fetch real bounties from Intuition
     useEffect(() => {
@@ -75,7 +83,7 @@
           console.log('Transformed bounties:', transformedBounties)
           console.log('Grouped submissions:', groupedSubmissions)
 
-          setBounties(transformedBounties)
+          setGraphqlBounties(transformedBounties)
           setSubmissionsByBounty(groupedSubmissions)
 
         } catch (err) {
@@ -90,7 +98,7 @@
     }, [])
 
     // Filter and sort bounties
-    const filteredBounties = bounties
+    const filteredBounties = allBounties
       .sort((a, b) => {
         if (sortBy === 'reward') return b.reward - a.reward
         if (sortBy === 'deadline') return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
@@ -125,6 +133,10 @@
       ...prev,
       [submissionModal.bountyId]: [...(prev[submissionModal.bountyId] || []), submission]
     }))
+    
+    // Also notify the parent component for global submission tracking
+    onSubmissionCreated?.(submission, submissionModal.bountyId)
+    
     closeSubmissionModal()
   }
 
