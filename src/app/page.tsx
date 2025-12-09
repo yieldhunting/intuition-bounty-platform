@@ -1,6 +1,6 @@
 'use client'
 
-  import { useState } from 'react'
+  import { useState, useEffect } from 'react'
   import { ConnectButton } from '@rainbow-me/rainbowkit'
   import { useAccount } from 'wagmi'
   import { BountyDiscovery } from '@/components/BountyDiscovery'
@@ -48,9 +48,61 @@
     const [activeTab, setActiveTab] = useState('discover')
     const { address } = useAccount()
 
-    // Real state management for bounties and submissions
+    // Real state management for bounties and submissions with localStorage persistence
     const [bounties, setBounties] = useState<Bounty[]>([])
     const [submissions, setSubmissions] = useState<Submission[]>([])
+    const [isHydrated, setIsHydrated] = useState(false)
+
+    // Load data from localStorage on mount
+    useEffect(() => {
+      try {
+        const savedBounties = localStorage.getItem('intuition-bounties')
+        const savedSubmissions = localStorage.getItem('intuition-submissions')
+        
+        if (savedBounties) {
+          const parsedBounties = JSON.parse(savedBounties)
+          setBounties(parsedBounties)
+          console.log('📋 Loaded bounties from localStorage:', parsedBounties.length)
+        }
+        
+        if (savedSubmissions) {
+          const parsedSubmissions = JSON.parse(savedSubmissions)
+          // Convert BigInt strings back to BigInt
+          const submissionsWithBigInt = parsedSubmissions.map((sub: any) => ({
+            ...sub,
+            forStake: BigInt(sub.forStake || 0),
+            againstStake: BigInt(sub.againstStake || 0)
+          }))
+          setSubmissions(submissionsWithBigInt)
+          console.log('📝 Loaded submissions from localStorage:', submissionsWithBigInt.length)
+        }
+      } catch (error) {
+        console.error('Error loading from localStorage:', error)
+      }
+      setIsHydrated(true)
+    }, [])
+
+    // Save bounties to localStorage whenever they change
+    useEffect(() => {
+      if (isHydrated && bounties.length > 0) {
+        localStorage.setItem('intuition-bounties', JSON.stringify(bounties))
+        console.log('💾 Saved bounties to localStorage:', bounties.length)
+      }
+    }, [bounties, isHydrated])
+
+    // Save submissions to localStorage whenever they change
+    useEffect(() => {
+      if (isHydrated && submissions.length > 0) {
+        // Convert BigInt to strings for JSON serialization
+        const submissionsForStorage = submissions.map(sub => ({
+          ...sub,
+          forStake: sub.forStake.toString(),
+          againstStake: sub.againstStake.toString()
+        }))
+        localStorage.setItem('intuition-submissions', JSON.stringify(submissionsForStorage))
+        console.log('💾 Saved submissions to localStorage:', submissions.length)
+      }
+    }, [submissions, isHydrated])
 
     // Handler for adding a new bounty
     const handleBountyCreated = (bounty: Bounty) => {
@@ -89,6 +141,15 @@
       )
     }
 
+    // Debug function to clear localStorage (only for development)
+    const clearLocalStorage = () => {
+      localStorage.removeItem('intuition-bounties')
+      localStorage.removeItem('intuition-submissions')
+      setBounties([])
+      setSubmissions([])
+      console.log('🗑️ Cleared all localStorage data')
+    }
+
     // Determine if user has admin/arbitrator privileges (mock logic)
     const isArbitrator = address && (
       address.toLowerCase().includes('1111') || 
@@ -96,6 +157,20 @@
       Math.random() > 0.7 // Random for demo
     )
     const isSystemAdmin = address && address.toLowerCase().includes('0000')
+
+    // Don't render until hydrated to avoid SSR issues
+    if (!isHydrated) {
+      return (
+        <main className="min-h-screen bg-black text-white p-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="text-gray-300 mt-4">Loading...</p>
+            </div>
+          </div>
+        </main>
+      )
+    }
 
     return (
       <main className="min-h-screen bg-black text-white p-8">
@@ -108,6 +183,21 @@
           <div className="flex justify-center mb-8">
             <ConnectButton />
           </div>
+
+          {/* Debug clear storage button (remove in production) */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="text-center mb-4">
+              <button
+                onClick={clearLocalStorage}
+                className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+              >
+                🗑️ Clear Storage (Dev Only)
+              </button>
+              <p className="text-xs text-gray-500 mt-1">
+                Bounties: {bounties.length} | Submissions: {submissions.length}
+              </p>
+            </div>
+          )}
 
           {/* About Section */}
           <div className="mb-12">
