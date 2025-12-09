@@ -64,10 +64,19 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
       
       console.log('🔄 Creating REAL stake with StakingManager...')
       
-      // Use real staking manager to create stake
+      // Find the selected submission to get its portal URL
+      const targetSubmission = submissions.find(s => s.id === selectedSubmission)
+      if (!targetSubmission) {
+        throw new Error('Selected submission not found')
+      }
+
+      console.log(`🔗 Staking on Portal URL: ${targetSubmission.portalUrl}`)
+
+      // Use real staking manager to create stake on the Portal list atom
       const realStake = await stakingManager.createStake({
         stakerId: address,
         submissionId: selectedSubmission,
+        portalUrl: targetSubmission.portalUrl, // Pass the portal URL for atom extraction
         amount: stakeAmountWei,
         position: stakePosition
       })

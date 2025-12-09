@@ -8,6 +8,41 @@ import {
   getTripleCost
 } from '@0xintuition/protocol'
 
+// ==================== UTILITY FUNCTIONS ====================
+
+/**
+ * Extract atom ID from Portal URL
+ */
+export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
+  try {
+    // Handle different Portal URL formats:
+    // https://portal.intuition.systems/list/0x1234...
+    // https://portal.intuition.systems/explore/list/0x1234...
+    // https://portal.intuition.systems/app/list/0x1234...
+    
+    const patterns = [
+      /\/list\/([0-9a-fA-F]{64,})/,  // /list/0x123...
+      /\/list\/0x([0-9a-fA-F]{64,})/, // /list/0x123...
+      /\/explore\/list\/([0-9a-fA-F]{64,})/, // /explore/list/0x123...
+      /\/app\/list\/([0-9a-fA-F]{64,})/, // /app/list/0x123...
+      /(0x[0-9a-fA-F]{64,})/, // Any 0x followed by 64+ hex chars
+    ]
+    
+    for (const pattern of patterns) {
+      const match = portalUrl.match(pattern)
+      if (match) {
+        const atomId = match[1].startsWith('0x') ? match[1] : `0x${match[1]}`
+        return atomId
+      }
+    }
+    
+    return null
+  } catch (error) {
+    console.error('Error extracting atom ID from Portal URL:', error)
+    return null
+  }
+}
+
 // ==================== TYPES & INTERFACES ====================
 
 export interface EscrowConfig {
@@ -54,6 +89,7 @@ export enum SubmissionStatus {
 export interface StakePosition {
   stakerId: string
   submissionId: string
+  portalUrl?: string  // Add portal URL to extract atom ID from
   amount: bigint
   position: 'for' | 'against'
   timestamp: Date
@@ -172,7 +208,20 @@ export class StakingManager {
    */
   async createStake(position: Omit<StakePosition, 'atomId' | 'timestamp'>): Promise<StakePosition> {
     try {
-      // First, get the cost for staking on this submission (triple)
+      // Extract atom ID from portal URL if provided
+      let targetAtomId: string | null = null
+      
+      if (position.portalUrl) {
+        targetAtomId = extractAtomIdFromPortalUrl(position.portalUrl)
+        console.log(`🔗 Extracted atom ID from Portal URL: ${targetAtomId}`)
+      }
+      
+      if (!targetAtomId) {
+        console.log(`⚠️ No valid atom ID found, falling back to demo mode`)
+        throw new Error('No valid atom ID found in portal URL')
+      }
+
+      // Get the cost for staking on this atom
       const stakeCost = await getTripleCost({ 
         address: this.multivaultAddress as `0x${string}`, 
         publicClient: this.publicClient 
@@ -180,17 +229,12 @@ export class StakingManager {
 
       console.log(`💰 Stake cost: ${stakeCost.toString()} tTRUST`)
 
-      // Create a triple representing the stake position
-      // Subject: stakerId, Predicate: "stakes_for"/"stakes_against", Object: submissionId
-      const predicate = await this._getStakePredicate(position.position)
-      
-      // For demo, we'll use deposit directly on the submission's vault
-      // In production, this would create a triple first, then deposit
       const totalAmount = position.amount + stakeCost
       
-      console.log(`🔄 Creating real stake: ${position.position} ${position.amount.toString()} on submission ${position.submissionId}`)
+      console.log(`🔄 Creating REAL stake: ${position.position} ${position.amount.toString()} on atom ${targetAtomId}`)
+      console.log(`📊 Staking on Portal list atom - this will increase the list's value!`)
 
-      // Use deposit to stake on the submission
+      // Use deposit to stake on the Portal list atom
       const txHash = await deposit(
         { 
           address: this.multivaultAddress as `0x${string}`, 
@@ -200,7 +244,7 @@ export class StakingManager {
         {
           args: [
             this.walletClient.account.address, // receiver
-            position.submissionId as `0x${string}`, // vaultId (using submissionId as proxy)
+            targetAtomId as `0x${string}`, // vaultId (Portal list atom ID)
             BigInt(1), // curveId (default curve)
             BigInt(0), // minShares (accept any amount)
           ],
