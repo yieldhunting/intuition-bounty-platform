@@ -71,6 +71,13 @@
 
     // Combine GraphQL bounties with locally created bounties
     const allBounties = [...propBounties, ...graphqlBounties]
+    
+    // Debug logging
+    console.log(`🔍 BountyDiscovery Debug:`)
+    console.log(`   PropBounties: ${propBounties.length}`, propBounties.map(b => ({ id: b.id, title: b.title })))
+    console.log(`   GraphQLBounties: ${graphqlBounties.length}`, graphqlBounties.map(b => ({ id: b.id, title: b.title })))
+    console.log(`   AllBounties: ${allBounties.length}`)
+    console.log(`   PropSubmissions: ${propSubmissions.length}`, propSubmissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
 
     // Fetch real bounties from Intuition
     useEffect(() => {
@@ -173,6 +180,13 @@
         global: globalSubs.length
       })
       
+      // Debug: Log all global submissions and their bountyIds
+      if (propSubmissions.length > 0) {
+        console.log(`🔍 All global submissions:`, propSubmissions.map(sub => ({ id: sub.id, bountyId: sub.bountyId, title: sub.bountyTitle })))
+        console.log(`🎯 Looking for bountyId: ${bountyId}`)
+        console.log(`🔗 Matching submissions:`, globalSubs.map(sub => ({ id: sub.id, title: sub.bountyTitle })))
+      }
+      
       return [...blockchainSubmissions, ...localSubs, ...globalSubs]
     }
 
@@ -251,6 +265,8 @@
           {filteredBounties.map((bounty) => {
             const allSubmissions = getAllSubmissions(bounty.id)
             const isReputationBounty = bounty.bountyType === 'reputation' || bounty.title.toLowerCase().includes('reputation')
+            
+            console.log(`🏆 Displaying bounty: ${bounty.title} (${bounty.id}) with ${allSubmissions.length} submissions`)
             return (
               <div key={bounty.id} className="bg-gray-700 border border-gray-600 rounded-lg p-4 hover:bg-gray-650 transition-colors">
                 <div className="flex justify-between items-start mb-2">
