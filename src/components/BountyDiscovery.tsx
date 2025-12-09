@@ -439,6 +439,63 @@
           })}
         </div>
 
+        {/* Orphaned Submissions - submissions that don't match any displayed bounty */}
+        {(() => {
+          const displayedBountyIds = filteredBounties.map(b => b.id)
+          const orphanedSubmissions = propSubmissions.filter(sub => !displayedBountyIds.includes(sub.bountyId))
+          
+          console.log(`🔍 Orphaned submissions check:`)
+          console.log(`   Displayed bounty IDs:`, displayedBountyIds)
+          console.log(`   All submission bounty IDs:`, propSubmissions.map(s => s.bountyId))
+          console.log(`   Orphaned submissions:`, orphanedSubmissions.length, orphanedSubmissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
+          
+          if (orphanedSubmissions.length > 0) {
+            return (
+              <div className="mt-8">
+                <div className="bg-yellow-900 border border-yellow-600 rounded-lg p-4 mb-4">
+                  <h4 className="text-yellow-300 font-medium mb-2">⚠️ Orphaned Submissions</h4>
+                  <p className="text-yellow-200 text-sm">
+                    Found {orphanedSubmissions.length} submission(s) that don't match any displayed bounty. 
+                    This usually means bounty IDs don't match between tabs.
+                  </p>
+                </div>
+                
+                <div className="space-y-3">
+                  {orphanedSubmissions.map((submission) => (
+                    <div key={submission.id} className="bg-red-900 border border-red-600 rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h5 className="text-red-300 font-medium">{submission.bountyTitle}</h5>
+                          <p className="text-red-200 text-sm">Bounty ID: {submission.bountyId}</p>
+                          <a
+                            href={submission.portalUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 text-sm break-all"
+                          >
+                            {submission.portalUrl}
+                          </a>
+                        </div>
+                        <button
+                          onClick={() => setSubmissionModal({
+                            isOpen: true,
+                            bountyId: submission.bountyId,
+                            bountyTitle: submission.bountyTitle
+                          })}
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                          Submit to This
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          }
+          return null
+        })()}
+
         {/* Submission Modal */}
         {submissionModal.isOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
