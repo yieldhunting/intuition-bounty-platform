@@ -67,7 +67,7 @@
           // Transform atoms into bounties
           const transformedBounties = response.atoms
             .map(transformAtomToBounty)
-            .filter(bounty => bounty !== null)
+            .filter((bounty: any) => bounty !== null)
 
           // Group submissions by bounty
           const groupedSubmissions = groupSubmissionsByBounty(response.atoms)

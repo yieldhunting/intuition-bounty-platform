@@ -97,25 +97,11 @@ export class EscrowManager {
   }
 
   /**
-   * Update escrow status using triples
+   * Update escrow status using triples (Demo mode - simplified)
    */
   async updateEscrowStatus(escrowVaultId: string, newStatus: EscrowStatus): Promise<void> {
-    try {
-      // Create new status triple
-      await createTriples(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        [{
-          subject: escrowVaultId,
-          predicate: await this._getOrCreatePredicate('status'),
-          object: await this._getOrCreatePredicate(newStatus)
-        }]
-      )
-
-      console.log(`✅ Escrow ${escrowVaultId} status updated to: ${newStatus}`)
-    } catch (error) {
-      console.error('❌ Status update failed:', error)
-      throw error
-    }
+    // Demo mode - just log the status update
+    console.log(`✅ Escrow ${escrowVaultId} status updated to: ${newStatus} (Demo)`)
   }
 
   /**
@@ -177,38 +163,18 @@ export class StakingManager {
   }
 
   /**
-   * Stake for or against a solution
+   * Stake for or against a solution (Demo mode)
    */
   async createStake(position: Omit<StakePosition, 'atomId' | 'timestamp'>): Promise<StakePosition> {
-    try {
-      const stakeAtom = await createAtomFromString(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        `STAKE: ${position.position.toUpperCase()} | Submission: ${position.submissionId} | Amount: ${position.amount.toString()} | Staker: ${position.stakerId}`
-      )
-
-      // Create stake relationship triple
-      await createTriples(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        [{
-          subject: position.stakerId,
-          predicate: await this._getStakePredicate(position.position),
-          object: position.submissionId
-        }]
-      )
-
-      const stake: StakePosition = {
-        ...position,
-        atomId: stakeAtom.state.termId,
-        timestamp: new Date()
-      }
-
-      console.log(`✅ Stake created: ${position.position} ${position.amount.toString()}`)
-      return stake
-
-    } catch (error) {
-      console.error('❌ Stake creation failed:', error)
-      throw error
+    // Demo mode - create mock stake
+    const stake: StakePosition = {
+      ...position,
+      atomId: `demo_stake_${Date.now()}`,
+      timestamp: new Date()
     }
+
+    console.log(`✅ Stake created (demo): ${position.position} ${position.amount.toString()}`)
+    return stake
   }
 
   /**
@@ -269,78 +235,40 @@ export class ArbitrationManager {
   }
 
   /**
-   * Create an arbitration case for disputed submissions
+   * Create an arbitration case for disputed submissions (Demo mode)
    */
   async createArbitrationCase(
     bountyId: string, 
     submissionId: string, 
     arbitratorAddress: string
   ): Promise<ArbitrationCase> {
-    try {
-      const arbitrationAtom = await createAtomFromString(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        `ARBITRATION: ${bountyId} | Submission: ${submissionId} | Arbitrator: ${arbitratorAddress} | Created: ${new Date().toISOString()}`
-      )
-
-      // Create arbitration relationship triple
-      await createTriples(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        [{
-          subject: arbitratorAddress,
-          predicate: 'arbitrates',
-          object: submissionId
-        }]
-      )
-
-      const arbitrationCase: ArbitrationCase = {
-        id: arbitrationAtom.state.termId,
-        bountyId,
-        submissionId,
-        arbitratorAddress,
-        decision: 'pending',
-        atomId: arbitrationAtom.state.termId
-      }
-
-      console.log('✅ Arbitration case created:', arbitrationCase.id)
-      return arbitrationCase
-
-    } catch (error) {
-      console.error('❌ Arbitration case creation failed:', error)
-      throw error
+    // Demo mode - create mock arbitration case
+    const arbitrationCase: ArbitrationCase = {
+      id: `demo_arbitration_${Date.now()}`,
+      bountyId,
+      submissionId,
+      arbitratorAddress,
+      decision: 'pending',
+      atomId: `demo_arbitration_${Date.now()}`
     }
+
+    console.log('✅ Arbitration case created (demo):', arbitrationCase.id)
+    return arbitrationCase
   }
 
   /**
-   * Submit arbitrator decision
+   * Submit arbitrator decision (Demo mode)
    */
   async submitDecision(
     arbitrationCaseId: string,
     decision: 'approve' | 'reject',
     reasoning?: string
   ): Promise<string> {
-    try {
-      const decisionAtom = await createAtomFromString(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        `DECISION: ${arbitrationCaseId} | Decision: ${decision.toUpperCase()} | Reasoning: ${reasoning || 'No reasoning provided'} | Decided: ${new Date().toISOString()}`
-      )
-
-      // Create decision relationship triple
-      await createTriples(
-        { walletClient: this.walletClient, publicClient: this.publicClient, address: this.multivaultAddress },
-        [{
-          subject: arbitrationCaseId,
-          predicate: 'decided_as',
-          object: decision
-        }]
-      )
-
-      console.log(`✅ Arbitration decision submitted: ${decision}`)
-      return decisionAtom.transactionHash
-
-    } catch (error) {
-      console.error('❌ Decision submission failed:', error)
-      throw error
-    }
+    // Demo mode - return mock transaction hash
+    const mockTxHash = `0x${Date.now().toString(16)}demo`
+    
+    console.log(`✅ Arbitration decision submitted (demo): ${decision}`)
+    return mockTxHash
   }
 }
 

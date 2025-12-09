@@ -260,7 +260,7 @@ export function AutomatedResolution({ isSystemAdmin = false }: AutomatedResoluti
 
     } catch (error) {
       console.error('Resolution execution error:', error)
-      setResult(`❌ Error executing resolution: ${error.message}`)
+      setResult(`❌ Error executing resolution: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsProcessing(false)
     }

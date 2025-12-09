@@ -39,13 +39,13 @@
 
         setResult(`✅ Real Atom created on Intuition! 
           Atom ID: ${atomResult.state.termId}
-          Vault ID: ${atomResult.state.vaultId}
+          Creator: ${atomResult.state.creator}
           Transaction: ${atomResult.transactionHash}`)
         setAtomText('')
 
       } catch (error) {
         console.error('Error creating atom:', error)
-        setResult(`❌ Error: ${error.message}`)
+        setResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       } finally {
         setIsLoading(false)
       }

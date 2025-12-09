@@ -6,6 +6,7 @@
   import { BountyDiscovery } from '@/components/BountyDiscovery'
   import { CreateBounty } from '@/components/CreateBounty'
   import { CommunityStaking } from '@/components/CommunityStaking'
+  import { SubmissionStatus } from '@/lib/escrow'
   import { ArbitratorDashboard } from '@/components/ArbitratorDashboard'
   import { AutomatedResolution } from '@/components/AutomatedResolution'
   import { ReputationSystem } from '@/components/ReputationSystem'
@@ -24,7 +25,7 @@
         submittedAt: new Date().toISOString(),
         forStake: BigInt('75000000000000000000'), // 75 tTRUST
         againstStake: BigInt('25000000000000000000'), // 25 tTRUST
-        status: 'staking_period' as const,
+        status: SubmissionStatus.STAKING_PERIOD,
         isLocal: false
       },
       {
@@ -35,7 +36,7 @@
         submittedAt: new Date().toISOString(),
         forStake: BigInt('40000000000000000000'), // 40 tTRUST
         againstStake: BigInt('60000000000000000000'), // 60 tTRUST
-        status: 'staking_period' as const,
+        status: SubmissionStatus.STAKING_PERIOD,
         isLocal: true
       }
     ])

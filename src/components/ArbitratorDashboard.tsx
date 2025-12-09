@@ -125,7 +125,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
 
     } catch (error) {
       console.error('Arbitration case creation error:', error)
-      setResult(`❌ Error: ${error.message}`)
+      setResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
@@ -179,7 +179,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
 
     } catch (error) {
       console.error('Decision submission error:', error)
-      setResult(`❌ Error: ${error.message}`)
+      setResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
@@ -337,41 +337,41 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
                           Make Decision
                         </button>
                       </div>
-                      <p className="text-purple-200 text-sm">Case ID: {submission.arbitrationCase.id}</p>
+                      <p className="text-purple-200 text-sm">Case ID: {submission.arbitrationCase?.id}</p>
                     </div>
                   ) : isDecided ? (
                     <div className={`p-3 border rounded ${
-                      submission.arbitrationCase.decision === 'approve'
+                      submission.arbitrationCase?.decision === 'approve'
                         ? 'bg-green-900 border-green-600'
                         : 'bg-red-900 border-red-600'
                     }`}>
                       <div className="flex items-center justify-between">
                         <div>
                           <p className={`font-medium ${
-                            submission.arbitrationCase.decision === 'approve'
+                            submission.arbitrationCase?.decision === 'approve'
                               ? 'text-green-300'
                               : 'text-red-300'
                           }`}>
-                            {submission.arbitrationCase.decision === 'approve' ? '✅ Approved' : '❌ Rejected'}
+                            {submission.arbitrationCase?.decision === 'approve' ? '✅ Approved' : '❌ Rejected'}
                           </p>
                           <p className="text-xs text-gray-400">
-                            Decided: {submission.arbitrationCase.decidedAt?.toLocaleDateString()}
+                            Decided: {submission.arbitrationCase?.decidedAt?.toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right text-sm">
                           <p className="text-gray-400">Arbitrator</p>
                           <p className="text-gray-300 font-mono text-xs">
-                            {submission.arbitrationCase.arbitratorAddress === address 
+                            {submission.arbitrationCase?.arbitratorAddress === address 
                               ? 'You' 
-                              : `${submission.arbitrationCase.arbitratorAddress.slice(0, 6)}...`
+                              : `${submission.arbitrationCase?.arbitratorAddress?.slice(0, 6)}...`
                             }
                           </p>
                         </div>
                       </div>
-                      {submission.arbitrationCase.reasoning && (
+                      {submission.arbitrationCase?.reasoning && (
                         <div className="mt-2 pt-2 border-t border-gray-600">
                           <p className="text-sm text-gray-300">
-                            <span className="text-gray-400">Reasoning:</span> {submission.arbitrationCase.reasoning}
+                            <span className="text-gray-400">Reasoning:</span> {submission.arbitrationCase?.reasoning}
                           </p>
                         </div>
                       )}
@@ -380,7 +380,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
                     <div className="p-3 bg-gray-600 border border-gray-500 rounded">
                       <p className="text-gray-300 font-medium">📋 Under Arbitration</p>
                       <p className="text-gray-400 text-sm">
-                        Assigned to: {submission.arbitrationCase.arbitratorAddress.slice(0, 10)}...
+                        Assigned to: {submission.arbitrationCase?.arbitratorAddress?.slice(0, 10)}...
                       </p>
                     </div>
                   )}

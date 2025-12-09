@@ -143,7 +143,7 @@
 
       } catch (error) {
         console.error('Error creating bounty:', error)
-        setResult(`❌ Error: ${error.message}`)
+        setResult(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
       } finally {
         setIsLoading(false)
       }

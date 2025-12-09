@@ -202,7 +202,7 @@ export function ReputationSystem({ userAddress, viewMode = 'profile' }: Reputati
         solverScore: 3200,
         arbitratorScore: 1500,
         stakingScore: 720,
-        level: 'master',
+        level: 'master' as const,
         badges: [],
         history: []
       },
@@ -213,7 +213,7 @@ export function ReputationSystem({ userAddress, viewMode = 'profile' }: Reputati
         solverScore: 2100,
         arbitratorScore: 2200,
         stakingScore: 590,
-        level: 'master',
+        level: 'master' as const,
         badges: [],
         history: []
       },
@@ -224,7 +224,7 @@ export function ReputationSystem({ userAddress, viewMode = 'profile' }: Reputati
         solverScore: 1200,
         arbitratorScore: 850,
         stakingScore: 797,
-        level: 'expert',
+        level: 'expert' as const,
         badges: [],
         history: []
       }
