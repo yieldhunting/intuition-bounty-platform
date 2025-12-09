@@ -17,18 +17,18 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
   try {
     console.log(`🔍 Parsing Portal URL: ${portalUrl}`)
     
-    // Portal URLs typically look like:
-    // https://testnet.portal.intuition.systems/explore/list/0x1234...
-    // We need to extract the list ID (object atom), not any predicate atoms
+    // Portal URLs contain TWO hexadecimal addresses:
+    // https://testnet.portal.intuition.systems/explore/list/0xOBJECT_ATOM/0xSECOND_ADDRESS
+    // We want the FIRST one (object atom), not the second one
     
     const patterns = [
-      // Match /list/0x[hex] or /explore/list/0x[hex] - this should be the object atom (list itself)
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{40,})/, // Standard format with 0x prefix, 40+ chars (20+ bytes)
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{40,})/, // Without 0x prefix, 40+ chars
+      // Match the FIRST hex address after /list/ - this is the object atom we want to stake on
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{40})(?:\/|$)/, // First address with 0x prefix (40 chars = 20 bytes)
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{40})(?:\/|$)/, // First address without 0x prefix
       
-      // Fallback patterns for shorter test IDs
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{6,})\.{0,3}/, // With ellipses
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{6,})\.{0,3}/, // Without 0x prefix, with ellipses
+      // Fallback patterns for test URLs with shorter IDs
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{6,})\.{0,3}(?:\/|$)/, // Test URLs with ellipses
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{6,})\.{0,3}(?:\/|$)/, // Without 0x prefix, with ellipses
     ]
     
     for (let i = 0; i < patterns.length; i++) {
@@ -49,13 +49,13 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
           atomId = expandTestAtomId(extractedId)
         }
           
-        console.log(`✅ Extracted object atom ID (list): ${atomId}`)
-        console.log(`📊 This should be the list atom itself, not a predicate atom`)
+        console.log(`✅ Extracted FIRST address (object atom): ${atomId}`)
+        console.log(`🎯 This is the object atom we want to stake on (ignoring any second address)`)
         return atomId
       }
     }
     
-    console.log(`❌ No list atom ID found in URL`)
+    console.log(`❌ No object atom (first address) found in URL`)
     return null
   } catch (error) {
     console.error('Error extracting atom ID from Portal URL:', error)
@@ -261,8 +261,8 @@ export class StakingManager {
     const totalAmount = position.amount + stakeCost
     
     console.log(`🔄 Creating REAL stake: ${position.position} ${position.amount.toString()} on atom ${targetAtomId}`)
-    console.log(`📊 Staking on Portal list atom (object atom) - this will increase the list's value!`)
-    console.log(`🎯 Target atom type: OBJECT ATOM (list itself), NOT predicate atom`)
+    console.log(`📊 Staking on FIRST address from Portal URL (object atom)`)
+    console.log(`🎯 Target: OBJECT ATOM (ignoring second address in URL)`)
     console.log(`💰 Total stake amount: ${totalAmount.toString()} (${position.amount.toString()} + ${stakeCost.toString()} cost)`)
 
     // Use deposit to stake on the Portal list atom
