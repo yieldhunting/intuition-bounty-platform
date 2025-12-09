@@ -4,7 +4,7 @@ A revolutionary decentralized marketplace for data bounties and reputation intel
 
 ## 🚀 Live Demo
 
-[🌐 **Try the Live Application**](https://intuition-bounty-board.vercel.app) *(Coming Soon)*
+[🌐 **Try the Live Application**](https://intuition-bounty-platform.vercel.app/) ✨ **LIVE NOW!**
 
 ## ✨ Key Features
 
@@ -52,8 +52,8 @@ The first decentralized platform enabling expert reputation analysis for any ato
 
 ```bash
 # Clone the repository
-git clone https://github.com/calummacdonald/intuition-bounty-board.git
-cd intuition-bounty-board
+git clone https://github.com/yieldhunting/intuition-bounty-platform.git
+cd intuition-bounty-platform
 
 # Install dependencies
 npm install
@@ -162,8 +162,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Contact
 
-- **Issues**: [GitHub Issues](https://github.com/calummacdonald/intuition-bounty-board/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/calummacdonald/intuition-bounty-board/discussions)
+- **Issues**: [GitHub Issues](https://github.com/yieldhunting/intuition-bounty-platform/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yieldhunting/intuition-bounty-platform/discussions)
 
 ---
 
