@@ -59,14 +59,22 @@
 
     // Handler for adding a new submission
     const handleSubmissionCreated = (submission: Omit<Submission, 'bountyTitle'>, bountyId: string) => {
+      console.log('🔍 Adding submission for bountyId:', bountyId)
+      console.log('📋 Available bounties:', bounties.map(b => ({ id: b.id, title: b.title })))
+      
+      // Find bounty from either local state or create fallback title
       const bounty = bounties.find(b => b.id === bountyId)
+      const bountyTitle = bounty?.title || `Bounty ${bountyId.slice(0, 8)}...`
+      
       const submissionWithBountyTitle: Submission = {
         ...submission,
-        bountyTitle: bounty?.title || 'Unknown Bounty',
+        bountyTitle,
         forStake: BigInt(0),
         againstStake: BigInt(0),
         status: SubmissionStatus.STAKING_PERIOD
       }
+      
+      console.log('✅ Created submission with title:', bountyTitle)
       setSubmissions(prev => [submissionWithBountyTitle, ...prev])
     }
 

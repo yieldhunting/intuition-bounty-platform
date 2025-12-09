@@ -188,7 +188,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
           <div className="space-y-4 mb-6">
             <h4 className="text-lg font-medium text-white">Available Submissions</h4>
             
-            {submissions.map((submission) => {
+            {submissions.filter(submission => submission && submission.id && submission.portalUrl).map((submission) => {
               const stakeData = calculateStakeRatio(submission.forStake, submission.againstStake)
               const userStakesForSubmission = getUserStakeForSubmission(submission.id)
               const isSubmitter = address === submission.submitterAddress
@@ -200,7 +200,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg font-medium text-white">{submission.bountyTitle}</span>
+                        <span className="text-lg font-medium text-white">{submission.bountyTitle || 'Unknown Bounty'}</span>
                         {submission.isLocal && (
                           <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-0.5 rounded">
                             Local
@@ -222,7 +222,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
                         {submission.portalUrl}
                       </a>
                       <p className="text-xs text-gray-400 mt-2">
-                        Submitted by: {submission.submitterAddress.slice(0, 10)}... • {new Date(submission.submittedAt).toLocaleDateString()}
+                        Submitted by: {submission.submitterAddress?.slice(0, 10) || 'Unknown'}... • {submission.submittedAt ? new Date(submission.submittedAt).toLocaleDateString() : 'Unknown date'}
                       </p>
                     </div>
 
