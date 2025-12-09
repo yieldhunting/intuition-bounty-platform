@@ -1,6 +1,8 @@
  'use client'
 
   import { useState } from 'react'
+  import { useAccount } from 'wagmi'
+  import { SubmissionStatus } from '@/lib/escrow'
 
   interface SubmitSolutionProps {
     bountyId: string
@@ -10,6 +12,7 @@
   }
 
   export function SubmitSolution({ bountyId, bountyTitle, onClose, onSubmit }: SubmitSolutionProps) {
+    const { address } = useAccount()
     const [portalUrl, setPortalUrl] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [result, setResult] = useState<string>('')
@@ -36,15 +39,19 @@
       setIsLoading(true)
 
       try {
-        // Create submission object for instant local storage
-          const submission = {
-    id: `local_${Date.now()}`,
-    portalUrl: portalUrl.trim(),
-    submitter: 'You',
-    submittedAt: new Date().toISOString(),
-    transactionHash: null, // Local submission, no transaction
-    isLocal: true // Add this flag
-  }
+        // Create submission object with all required fields for localStorage persistence
+        const submission = {
+          id: `local_${Date.now()}`,
+          bountyId: bountyId, // Required for proper bounty association
+          bountyTitle: bountyTitle, // Required for display
+          submitterAddress: address || 'Unknown', // Required for validation
+          portalUrl: portalUrl.trim(),
+          submittedAt: new Date().toISOString(),
+          forStake: BigInt(0), // Required bigint field
+          againstStake: BigInt(0), // Required bigint field
+          status: SubmissionStatus.STAKING_PERIOD, // Required enum
+          isLocal: true // Local submission flag
+        }
 
 
         // Add to local submissions immediately

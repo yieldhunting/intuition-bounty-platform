@@ -52,7 +52,6 @@
     const [filter, setFilter] = useState('all')
     const [sortBy, setSortBy] = useState('newest')
     const [submissionsByBounty, setSubmissionsByBounty] = useState<{ [bountyId: string]: any[] }>({})
-    const [localSubmissions, setLocalSubmissions] = useState<{ [bountyId: string]: any[] }>({})
     const [expandedSubmissions, setExpandedSubmissions] = useState<{ [bountyId: string]: boolean }>({})
     const [submissionModal, setSubmissionModal] = useState<{
       isOpen: boolean
@@ -178,12 +177,10 @@
     }
 
    const handleAddSubmission = (submission: any) => {
-    setLocalSubmissions(prev => ({
-      ...prev,
-      [submissionModal.bountyId]: [...(prev[submissionModal.bountyId] || []), submission]
-    }))
+    console.log('📝 BountyDiscovery: Adding submission to global state only', submission)
     
-    // Also notify the parent component for global submission tracking
+    // Only notify parent component for global submission tracking
+    // This ensures submissions persist in localStorage and appear everywhere
     onSubmissionCreated?.(submission, submissionModal.bountyId)
     
     closeSubmissionModal()
@@ -196,15 +193,13 @@
       }))
     }
 
-    // Combine blockchain submissions with local submissions
+    // Get all submissions for a bounty (blockchain + global state submissions)
     const getAllSubmissions = (bountyId: string) => {
       const blockchainSubmissions = submissionsByBounty[bountyId] || []
-      const localSubs = localSubmissions[bountyId] || []
       const globalSubs = propSubmissions.filter(sub => sub.bountyId === bountyId) || []
       
       console.log(`📋 Getting submissions for bounty ${bountyId}:`, {
         blockchain: blockchainSubmissions.length,
-        local: localSubs.length,
         global: globalSubs.length
       })
       
@@ -215,7 +210,7 @@
         console.log(`🔗 Matching submissions:`, globalSubs.map(sub => ({ id: sub.id, title: sub.bountyTitle })))
       }
       
-      return [...blockchainSubmissions, ...localSubs, ...globalSubs]
+      return [...blockchainSubmissions, ...globalSubs]
     }
 
     if (loading) {
