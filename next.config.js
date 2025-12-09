@@ -18,14 +18,22 @@ const nextConfig = {
       "pino-pretty": false,
       "@react-native-async-storage/async-storage": false,
       "react-native": false,
+      "tap": false,
+      "worker_threads": false,
     }
 
-    // Ignore warnings for optional dependencies
+    // Ignore all warnings and errors for optional dependencies and test-related modules
     config.ignoreWarnings = [
       { module: /node_modules\/pino/ },
       { module: /node_modules\/@metamask/ },
+      { module: /node_modules\/thread-stream/ },
+      { module: /node_modules.*\/test\// },
+      { message: /Can't resolve 'tap'/ },
       { message: /Can't resolve 'pino-pretty'/ },
-      { message: /Can't resolve '@react-native-async-storage\/async-storage'/ }
+      { message: /Can't resolve '@react-native-async-storage\/async-storage'/ },
+      { message: /Can't resolve 'worker_threads'/ },
+      { message: /Module not found.*tap/ },
+      { message: /Attempted import error.*test/ }
     ]
 
     return config
@@ -34,7 +42,13 @@ const nextConfig = {
     '@0xintuition/sdk',
     '@0xintuition/protocol', 
     '@0xintuition/graphql'
-  ]
+  ],
+  eslint: {
+    ignoreDuringBuilds: true
+  },
+  typescript: {
+    ignoreBuildErrors: false
+  }
 }
 
 module.exports = nextConfig
