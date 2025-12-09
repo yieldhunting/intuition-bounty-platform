@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  
   webpack: (config, { isServer, webpack }) => {
     // Exclude problematic viem test decorators completely
     config.plugins.push(
@@ -69,9 +70,6 @@ const nextConfig = {
     '@0xintuition/protocol', 
     '@0xintuition/graphql'
   ],
-  eslint: {
-    ignoreDuringBuilds: true
-  },
   typescript: {
     ignoreBuildErrors: false
   }
