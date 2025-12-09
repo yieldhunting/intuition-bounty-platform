@@ -97,21 +97,17 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
         onStakeUpdate(selectedSubmission, newForStake, newAgainstStake)
       }
 
-      // Check if real blockchain transaction was used
-      const isRealTransaction = realStake.atomId.startsWith('stake_') && !realStake.atomId.includes('demo')
-      
-      setResult(`✅ Stake placed successfully! ${isRealTransaction ? '🔗 BLOCKCHAIN CONFIRMED' : '📱 Demo Mode'}
+      setResult(`✅ Stake placed successfully! 🔗 BLOCKCHAIN CONFIRMED
         Position: ${stakePosition.toUpperCase()}
         Amount: ${amount} tTRUST
         Submission: ${selectedSubmission.slice(0, 20)}...
         Atom ID: ${realStake.atomId}
+        Portal URL: ${targetSubmission.portalUrl}
         
         Your stake is now active in the validation process.
         
-        ${isRealTransaction 
-          ? '🚀 This was a REAL blockchain transaction with tTRUST tokens!'
-          : '📝 Demo mode - blockchain integration available when connected to testnet.'
-        }`)
+        🚀 This was a REAL blockchain transaction with tTRUST tokens!
+        📊 You staked on the Portal list atom to increase its value.`)
 
       // Reset form
       setStakeAmount('10')

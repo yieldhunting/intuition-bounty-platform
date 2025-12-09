@@ -207,85 +207,69 @@ export class StakingManager {
    * Stake for or against a solution using real blockchain calls
    */
   async createStake(position: Omit<StakePosition, 'atomId' | 'timestamp'>): Promise<StakePosition> {
-    try {
-      // Extract atom ID from portal URL if provided
-      let targetAtomId: string | null = null
-      
-      if (position.portalUrl) {
-        targetAtomId = extractAtomIdFromPortalUrl(position.portalUrl)
-        console.log(`🔗 Extracted atom ID from Portal URL: ${targetAtomId}`)
-      }
-      
-      if (!targetAtomId) {
-        console.log(`⚠️ No valid atom ID found, falling back to demo mode`)
-        throw new Error('No valid atom ID found in portal URL')
-      }
-
-      // Get the cost for staking on this atom
-      const stakeCost = await getTripleCost({ 
-        address: this.multivaultAddress as `0x${string}`, 
-        publicClient: this.publicClient 
-      })
-
-      console.log(`💰 Stake cost: ${stakeCost.toString()} tTRUST`)
-
-      const totalAmount = position.amount + stakeCost
-      
-      console.log(`🔄 Creating REAL stake: ${position.position} ${position.amount.toString()} on atom ${targetAtomId}`)
-      console.log(`📊 Staking on Portal list atom - this will increase the list's value!`)
-
-      // Use deposit to stake on the Portal list atom
-      const txHash = await deposit(
-        { 
-          address: this.multivaultAddress as `0x${string}`, 
-          walletClient: this.walletClient, 
-          publicClient: this.publicClient 
-        },
-        {
-          args: [
-            this.walletClient.account.address, // receiver
-            targetAtomId as `0x${string}`, // vaultId (Portal list atom ID)
-            BigInt(1), // curveId (default curve)
-            BigInt(0), // minShares (accept any amount)
-          ],
-          value: totalAmount
-        }
-      )
-
-      console.log(`🔄 Transaction submitted: ${txHash}`)
-
-      // Wait for transaction confirmation
-      const receipt = await this.publicClient.waitForTransactionReceipt({ hash: txHash })
-      
-      if (receipt.status === 'reverted') {
-        throw new Error('Staking transaction reverted')
-      }
-
-      // For now, use a simple ID until we implement event parsing
-      const stakeAtomId = `stake_${Date.now()}`
-
-      const stake: StakePosition = {
-        ...position,
-        atomId: stakeAtomId.toString(),
-        timestamp: new Date()
-      }
-
-      console.log(`✅ Real stake created successfully! Transaction: ${txHash}`)
-      return stake
-
-    } catch (error) {
-      console.error('❌ Real staking failed, falling back to demo mode:', error)
-      
-      // Fallback to demo mode if real staking fails
-      const stake: StakePosition = {
-        ...position,
-        atomId: `demo_stake_${Date.now()}`,
-        timestamp: new Date()
-      }
-
-      console.log(`✅ Stake created (demo fallback): ${position.position} ${position.amount.toString()}`)
-      return stake
+    // Extract atom ID from portal URL if provided
+    let targetAtomId: string | null = null
+    
+    if (position.portalUrl) {
+      targetAtomId = extractAtomIdFromPortalUrl(position.portalUrl)
+      console.log(`🔗 Extracted atom ID from Portal URL: ${targetAtomId}`)
     }
+    
+    if (!targetAtomId) {
+      throw new Error('No valid atom ID found in portal URL - please check the URL format')
+    }
+
+    // Get the cost for staking on this atom
+    const stakeCost = await getTripleCost({ 
+      address: this.multivaultAddress as `0x${string}`, 
+      publicClient: this.publicClient 
+    })
+
+    console.log(`💰 Stake cost: ${stakeCost.toString()} tTRUST`)
+
+    const totalAmount = position.amount + stakeCost
+    
+    console.log(`🔄 Creating REAL stake: ${position.position} ${position.amount.toString()} on atom ${targetAtomId}`)
+    console.log(`📊 Staking on Portal list atom - this will increase the list's value!`)
+
+    // Use deposit to stake on the Portal list atom
+    const txHash = await deposit(
+      { 
+        address: this.multivaultAddress as `0x${string}`, 
+        walletClient: this.walletClient, 
+        publicClient: this.publicClient 
+      },
+      {
+        args: [
+          this.walletClient.account.address, // receiver
+          targetAtomId as `0x${string}`, // vaultId (Portal list atom ID)
+          BigInt(1), // curveId (default curve)
+          BigInt(0), // minShares (accept any amount)
+        ],
+        value: totalAmount
+      }
+    )
+
+    console.log(`🔄 Transaction submitted: ${txHash}`)
+
+    // Wait for transaction confirmation
+    const receipt = await this.publicClient.waitForTransactionReceipt({ hash: txHash })
+    
+    if (receipt.status === 'reverted') {
+      throw new Error('Staking transaction reverted')
+    }
+
+    // For now, use a simple ID until we implement event parsing
+    const stakeAtomId = `stake_${Date.now()}`
+
+    const stake: StakePosition = {
+      ...position,
+      atomId: stakeAtomId.toString(),
+      timestamp: new Date()
+    }
+
+    console.log(`✅ Real stake created successfully! Transaction: ${txHash}`)
+    return stake
   }
 
   /**
