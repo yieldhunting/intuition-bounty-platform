@@ -23,12 +23,20 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
     
     const patterns = [
       // Match the FIRST hex address after /list/ - this is the object atom we want to stake on
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{40})(?:\/|$)/, // First address with 0x prefix (40 chars = 20 bytes)
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{40})(?:\/|$)/, // First address without 0x prefix
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{40})(?:\/|$|#)/, // First address with 0x prefix (40 chars = 20 bytes)
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{40})(?:\/|$|#)/, // First address without 0x prefix
       
-      // Fallback patterns for test URLs with shorter IDs
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{6,})\.{0,3}(?:\/|$)/, // Test URLs with ellipses
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{6,})\.{0,3}(?:\/|$)/, // Without 0x prefix, with ellipses
+      // More flexible patterns for different lengths
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{32,})(?:\/|$|#)/, // 32+ chars with 0x
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{32,})(?:\/|$|#)/, // 32+ chars without 0x
+      
+      // Even more flexible - any hex after /list/
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars with 0x, stop at /, $, #, or ?
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars without 0x
+      
+      // Fallback patterns for test URLs with shorter IDs and ellipses
+      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{6,})\.{0,3}/, // Test URLs with ellipses
+      /\/(?:explore\/)?list\/([0-9a-fA-F]{6,})\.{0,3}/, // Without 0x prefix, with ellipses
     ]
     
     for (let i = 0; i < patterns.length; i++) {
@@ -41,7 +49,7 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
         
         // For real Portal URLs, use the extracted ID directly
         let atomId: string
-        if (extractedId.length >= 40) {
+        if (extractedId.length >= 32) {
           // Real atom ID - use as is
           atomId = extractedId.startsWith('0x') ? extractedId : `0x${extractedId}`
         } else {
@@ -55,7 +63,23 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
       }
     }
     
-    console.log(`❌ No object atom (first address) found in URL`)
+    // Emergency fallback - find ANY hex string in the URL that looks like an address
+    console.log(`⚠️ Standard patterns failed, trying emergency fallback...`)
+    const emergencyPattern = /0x[0-9a-fA-F]{20,}/g
+    const allMatches = portalUrl.match(emergencyPattern)
+    if (allMatches && allMatches.length > 0) {
+      const firstMatch = allMatches[0].replace('0x', '')
+      const atomId = `0x${firstMatch}`
+      console.log(`🔧 Emergency fallback found: ${atomId} (using first hex string in URL)`)
+      console.log(`🎯 Assuming this is the object atom we want to stake on`)
+      return atomId
+    }
+    
+    console.log(`❌ No hex addresses found anywhere in URL: ${portalUrl}`)
+    console.log(`📝 URL structure analysis:`)
+    console.log(`   Full URL: ${portalUrl}`)
+    console.log(`   Contains /list/: ${portalUrl.includes('/list/')}`)
+    console.log(`   Contains 0x: ${portalUrl.includes('0x')}`)
     return null
   } catch (error) {
     console.error('Error extracting atom ID from Portal URL:', error)
