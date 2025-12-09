@@ -288,6 +288,7 @@
             {activeTab === 'discover' && (
               <BountyDiscovery 
                 bounties={bounties}
+                submissions={submissions}
                 onSubmissionCreated={handleSubmissionCreated}
               />
             )}

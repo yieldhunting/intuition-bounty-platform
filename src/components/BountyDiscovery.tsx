@@ -26,12 +26,26 @@
     reputationCriteria?: string
   }
 
+  interface Submission {
+    id: string
+    bountyId: string
+    bountyTitle: string
+    submitterAddress: string
+    portalUrl: string
+    submittedAt: string
+    forStake: bigint
+    againstStake: bigint
+    status: any
+    isLocal?: boolean
+  }
+
   interface BountyDiscoveryProps {
     bounties: Bounty[]
+    submissions: Submission[]
     onSubmissionCreated?: (submission: any, bountyId: string) => void
   }
 
-  export function BountyDiscovery({ bounties: propBounties, onSubmissionCreated }: BountyDiscoveryProps) {
+  export function BountyDiscovery({ bounties: propBounties, submissions: propSubmissions, onSubmissionCreated }: BountyDiscoveryProps) {
     const [graphqlBounties, setGraphqlBounties] = useState<Bounty[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string>('')
@@ -151,7 +165,15 @@
     const getAllSubmissions = (bountyId: string) => {
       const blockchainSubmissions = submissionsByBounty[bountyId] || []
       const localSubs = localSubmissions[bountyId] || []
-      return [...blockchainSubmissions, ...localSubs]
+      const globalSubs = propSubmissions.filter(sub => sub.bountyId === bountyId) || []
+      
+      console.log(`📋 Getting submissions for bounty ${bountyId}:`, {
+        blockchain: blockchainSubmissions.length,
+        local: localSubs.length,
+        global: globalSubs.length
+      })
+      
+      return [...blockchainSubmissions, ...localSubs, ...globalSubs]
     }
 
     if (loading) {
