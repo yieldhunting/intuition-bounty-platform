@@ -475,6 +475,12 @@
           console.log(`🔍 Orphaned submissions check:`)
           console.log(`   Displayed bounty IDs:`, displayedBountyIds)
           console.log(`   All submission bounty IDs:`, propSubmissions.map(s => s.bountyId))
+          console.log(`   Detailed submissions:`, propSubmissions.map(s => ({ 
+            id: s.id, 
+            bountyId: s.bountyId, 
+            bountyIdLength: s.bountyId?.length || 0,
+            title: s.bountyTitle 
+          })))
           console.log(`   Orphaned submissions:`, orphanedSubmissions.length, orphanedSubmissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
           
           if (orphanedSubmissions.length > 0) {
@@ -484,8 +490,24 @@
                   <h4 className="text-yellow-300 font-medium mb-2">⚠️ Orphaned Submissions</h4>
                   <p className="text-yellow-200 text-sm">
                     Found {orphanedSubmissions.length} submission(s) that don't match any displayed bounty. 
-                    This usually means bounty IDs don't match between tabs.
+                    This usually means bounty IDs are empty or don't match between tabs.
                   </p>
+                  <button 
+                    onClick={() => {
+                      // Assign all orphaned submissions to the first available bounty
+                      const firstBounty = filteredBounties[0]
+                      if (firstBounty && onSubmissionCreated) {
+                        orphanedSubmissions.forEach(sub => {
+                          const fixedSubmission = { ...sub, bountyId: firstBounty.id }
+                          console.log(`🔧 Reassigning submission ${sub.id} to bounty ${firstBounty.id}`)
+                          onSubmissionCreated(fixedSubmission, firstBounty.id)
+                        })
+                      }
+                    }}
+                    className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                  >
+                    🔧 Fix All - Assign to First Bounty
+                  </button>
                 </div>
                 
                 <div className="space-y-3">
