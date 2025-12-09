@@ -17,26 +17,25 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
   try {
     console.log(`🔍 Parsing Portal URL: ${portalUrl}`)
     
-    // Portal URLs contain TWO hexadecimal addresses:
-    // https://testnet.portal.intuition.systems/explore/list/0xOBJECT_ATOM/0xSECOND_ADDRESS
-    // We want the FIRST one (object atom), not the second one
+    // Portal URLs contain TWO hexadecimal addresses separated by a dash:
+    // https://testnet.portal.intuition.systems/explore/list/0xFIRST_ADDRESS-0xSECOND_ADDRESS
+    // We want the SECOND one (object atom), not the first one
     
     const patterns = [
-      // Match the FIRST hex address after /list/ - this is the object atom we want to stake on
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{40})(?:\/|$|#)/, // First address with 0x prefix (40 chars = 20 bytes)
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{40})(?:\/|$|#)/, // First address without 0x prefix
+      // Match the SECOND hex address after the dash - this is the object atom we want to stake on
+      // Format: /list/0xFIRST-0xSECOND where we want SECOND
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-0x([0-9a-fA-F]{64})(?:\/|$|#|\?)/, // Second address, 64 chars
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-([0-9a-fA-F]{64})(?:\/|$|#|\?)/, // Second address without 0x, 64 chars
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-0x([0-9a-fA-F]{40,})(?:\/|$|#|\?)/, // Second address, 40+ chars  
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-([0-9a-fA-F]{40,})(?:\/|$|#|\?)/, // Second address without 0x, 40+ chars
       
       // More flexible patterns for different lengths
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{32,})(?:\/|$|#)/, // 32+ chars with 0x
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{32,})(?:\/|$|#)/, // 32+ chars without 0x
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-0x([0-9a-fA-F]{32,})(?:\/|$|#|\?)/, // 32+ chars
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-([0-9a-fA-F]{32,})(?:\/|$|#|\?)/, // 32+ chars without 0x
       
-      // Even more flexible - any hex after /list/
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars with 0x, stop at /, $, #, or ?
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars without 0x
-      
-      // Fallback patterns for test URLs with shorter IDs and ellipses
-      /\/(?:explore\/)?list\/0x([0-9a-fA-F]{6,})\.{0,3}/, // Test URLs with ellipses
-      /\/(?:explore\/)?list\/([0-9a-fA-F]{6,})\.{0,3}/, // Without 0x prefix, with ellipses
+      // Even more flexible - any hex after dash
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-0x([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars
+      /\/(?:explore\/)?list\/0x[0-9a-fA-F]+-([0-9a-fA-F]{8,})(?:\/|$|#|\?)/, // 8+ chars without 0x
     ]
     
     for (let i = 0; i < patterns.length; i++) {
@@ -57,21 +56,29 @@ export function extractAtomIdFromPortalUrl(portalUrl: string): string | null {
           atomId = expandTestAtomId(extractedId)
         }
           
-        console.log(`✅ Extracted FIRST address (object atom): ${atomId}`)
-        console.log(`🎯 This is the object atom we want to stake on (ignoring any second address)`)
+        console.log(`✅ Extracted SECOND address (object atom): ${atomId}`)
+        console.log(`🎯 This is the object atom we want to stake on (from after the dash)`)
         return atomId
       }
     }
     
-    // Emergency fallback - find ANY hex string in the URL that looks like an address
+    // Emergency fallback - find hex strings and take the SECOND one (after dash)
     console.log(`⚠️ Standard patterns failed, trying emergency fallback...`)
     const emergencyPattern = /0x[0-9a-fA-F]{20,}/g
     const allMatches = portalUrl.match(emergencyPattern)
-    if (allMatches && allMatches.length > 0) {
-      const firstMatch = allMatches[0].replace('0x', '')
-      const atomId = `0x${firstMatch}`
-      console.log(`🔧 Emergency fallback found: ${atomId} (using first hex string in URL)`)
+    if (allMatches && allMatches.length >= 2) {
+      // Take the SECOND hex string (index 1)
+      const secondMatch = allMatches[1].replace('0x', '')
+      const atomId = `0x${secondMatch}`
+      console.log(`🔧 Emergency fallback found: ${atomId} (using SECOND hex string in URL)`)
       console.log(`🎯 Assuming this is the object atom we want to stake on`)
+      return atomId
+    } else if (allMatches && allMatches.length === 1) {
+      // Only one hex string found, use it
+      const onlyMatch = allMatches[0].replace('0x', '')
+      const atomId = `0x${onlyMatch}`
+      console.log(`🔧 Emergency fallback found: ${atomId} (only one hex string in URL)`)
+      console.log(`⚠️ Expected two hex strings but found only one`)
       return atomId
     }
     
@@ -285,8 +292,8 @@ export class StakingManager {
     const totalAmount = position.amount + stakeCost
     
     console.log(`🔄 Creating REAL stake: ${position.position} ${position.amount.toString()} on atom ${targetAtomId}`)
-    console.log(`📊 Staking on FIRST address from Portal URL (object atom)`)
-    console.log(`🎯 Target: OBJECT ATOM (ignoring second address in URL)`)
+    console.log(`📊 Staking on SECOND address from Portal URL (object atom)`)
+    console.log(`🎯 Target: OBJECT ATOM (the address after the dash in URL)`)
     console.log(`💰 Total stake amount: ${totalAmount.toString()} (${position.amount.toString()} + ${stakeCost.toString()} cost)`)
 
     // Use deposit to stake on the Portal list atom
