@@ -72,11 +72,39 @@
     // Combine GraphQL bounties with locally created bounties
     const allBounties = [...propBounties, ...graphqlBounties]
     
+    // Create missing bounties from orphaned submissions
+    const existingBountyIds = allBounties.map(b => b.id)
+    const orphanedSubmissions = propSubmissions.filter(sub => !existingBountyIds.includes(sub.bountyId))
+    const missingBounties = orphanedSubmissions.reduce((acc, submission) => {
+      if (!acc.find(b => b.id === submission.bountyId)) {
+        acc.push({
+          id: submission.bountyId,
+          title: submission.bountyTitle,
+          description: `Auto-created bounty for submissions`,
+          reward: 0,
+          deadline: new Date().toISOString(),
+          category: 'Data Collection',
+          creator: 'Auto-generated',
+          creatorAddress: '',
+          submissions: 0,
+          totalStake: 0,
+          atomId: submission.bountyId,
+          transactionHash: '',
+          createdAt: new Date().toISOString(),
+          bountyType: 'data' as const
+        })
+      }
+      return acc
+    }, [] as typeof allBounties)
+    
+    const allBountiesWithMissing = [...allBounties, ...missingBounties]
+    
     // Debug logging
     console.log(`🔍 BountyDiscovery Debug:`)
     console.log(`   PropBounties: ${propBounties.length}`, propBounties.map(b => ({ id: b.id, title: b.title })))
     console.log(`   GraphQLBounties: ${graphqlBounties.length}`, graphqlBounties.map(b => ({ id: b.id, title: b.title })))
-    console.log(`   AllBounties: ${allBounties.length}`)
+    console.log(`   MissingBounties: ${missingBounties.length}`, missingBounties.map(b => ({ id: b.id, title: b.title })))
+    console.log(`   AllBounties: ${allBountiesWithMissing.length}`)
     console.log(`   PropSubmissions: ${propSubmissions.length}`, propSubmissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
 
     // Fetch real bounties from Intuition
@@ -119,7 +147,7 @@
     }, [])
 
     // Filter and sort bounties
-    const filteredBounties = allBounties
+    const filteredBounties = allBountiesWithMissing
       .sort((a, b) => {
         if (sortBy === 'reward') return b.reward - a.reward
         if (sortBy === 'deadline') return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
