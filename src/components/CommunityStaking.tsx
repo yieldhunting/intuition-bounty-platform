@@ -29,7 +29,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
 
   const [stakingManager, setStakingManager] = useState<StakingManager | null>(null)
   const [selectedSubmission, setSelectedSubmission] = useState<string>('')
-  const [stakeAmount, setStakeAmount] = useState<string>('10')
+  const [stakeAmount, setStakeAmount] = useState<string>('1')
   const [stakePosition, setStakePosition] = useState<'for' | 'against'>('for')
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<string>('')
@@ -109,7 +109,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
         📊 You staked on the Portal list atom to increase its value.`)
 
       // Reset form
-      setStakeAmount('10')
+      setStakeAmount('1')
       setSelectedSubmission('')
 
     } catch (error) {
