@@ -9,9 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@0xintuition/graphql": "^2.0.2",
+    "@0xintuition/protocol": "^2.0.0-alpha.2",
+    "@0xintuition/sdk": "^2.0.0-alpha.2",
+    "@rainbow-me/rainbowkit": "^2.2.9",
+    "graphql": "^16.12.0",
+    "graphql-request": "^7.3.5",
     "next": "16.0.7",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "viem": "^2.41.2",
+    "wagmi": "^2.19.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
