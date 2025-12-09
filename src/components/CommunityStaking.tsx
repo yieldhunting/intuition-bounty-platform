@@ -44,8 +44,8 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
     }
   }, [walletClient, publicClient, chainId])
 
-  const handleCreateStake = () => {
-    if (!address || !selectedSubmission) {
+  const handleCreateStake = async () => {
+    if (!address || !selectedSubmission || !stakingManager) {
       alert('Please select a submission and connect your wallet')
       return
     }
@@ -59,22 +59,21 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
     setIsLoading(true)
     setResult('')
 
-    // Simulate network delay
-    setTimeout(() => {
+    try {
       const stakeAmountWei = BigInt(Math.floor(amount * 1e18))
       
-      // Create mock stake for local tracking
-      const mockStake = {
+      console.log('🔄 Creating REAL stake with StakingManager...')
+      
+      // Use real staking manager to create stake
+      const realStake = await stakingManager.createStake({
         stakerId: address,
         submissionId: selectedSubmission,
         amount: stakeAmountWei,
-        position: stakePosition,
-        atomId: `mock_stake_${Date.now()}`,
-        timestamp: new Date()
-      }
+        position: stakePosition
+      })
 
-      // Update local stakes
-      setUserStakes(prev => [...prev, mockStake])
+      // Update local stakes with the real stake result
+      setUserStakes(prev => [...prev, realStake])
 
       // Find and update submission stakes visually
       const submission = submissions.find(s => s.id === selectedSubmission)
@@ -89,20 +88,34 @@ export function CommunityStaking({ bountyId, bountyTitle, submissions, onStakeUp
         onStakeUpdate(selectedSubmission, newForStake, newAgainstStake)
       }
 
-      setResult(`✅ Stake placed successfully! (Demo Mode)
+      // Check if real blockchain transaction was used
+      const isRealTransaction = realStake.atomId.startsWith('stake_') && !realStake.atomId.includes('demo')
+      
+      setResult(`✅ Stake placed successfully! ${isRealTransaction ? '🔗 BLOCKCHAIN CONFIRMED' : '📱 Demo Mode'}
         Position: ${stakePosition.toUpperCase()}
         Amount: ${amount} tTRUST
         Submission: ${selectedSubmission.slice(0, 20)}...
+        Atom ID: ${realStake.atomId}
         
         Your stake is now active in the validation process.
         
-        Note: This is a visual simulation for demo purposes.`)
+        ${isRealTransaction 
+          ? '🚀 This was a REAL blockchain transaction with tTRUST tokens!'
+          : '📝 Demo mode - blockchain integration available when connected to testnet.'
+        }`)
 
       // Reset form
       setStakeAmount('10')
       setSelectedSubmission('')
+
+    } catch (error) {
+      console.error('❌ Real staking failed:', error)
+      setResult(`❌ Staking failed: ${error instanceof Error ? error.message : 'Unknown error'}
+        
+        Please check your wallet connection and try again.`)
+    } finally {
       setIsLoading(false)
-    }, 1500) // 1.5 second delay to simulate blockchain transaction
+    }
   }
 
   const calculateStakeRatio = (forStake: bigint, againstStake: bigint) => {
