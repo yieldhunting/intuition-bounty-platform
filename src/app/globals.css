@@ -174,22 +174,3 @@ body {
   100% { transform: translateY(100vh); }
 }
 
-/* Cyberpunk visual indicator */
-body::after {
-  content: '◉ SYSTEM ONLINE';
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
-  padding: 6px 12px;
-  font-size: 10px;
-  font-family: 'Orbitron', monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  z-index: 1000;
-  pointer-events: none;
-  box-shadow: 0 0 10px var(--neon-cyan);
-  text-shadow: 0 0 5px var(--neon-cyan);
-}
