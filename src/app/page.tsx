@@ -177,6 +177,7 @@
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8 text-white">
             Intuition Bounty Board
+            <span className="ml-4 text-sm bg-green-600 px-2 py-1 rounded">UPDATED ✨</span>
           </h1>
 
           {/* Wallet Connection */}
