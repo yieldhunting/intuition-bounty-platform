@@ -78,7 +78,7 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
     }
     
     // Smart fallback for common bounty patterns
-    if (bountyId.includes('0xdc14ab')) {
+    if (bountyId.includes('0xdc14ab') || bountyId.includes('dc14ab')) {
       return 'NFT Communities Data'
     }
     if (bountyId.includes('0x0b1c09')) {
@@ -250,7 +250,18 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
           <div className="space-y-4 mb-6">
             <h4 className="text-lg font-medium text-white">Available Submissions</h4>
             
-            {submissions.filter(submission => submission && submission.id && submission.portalUrl).map((submission) => {
+            {(() => {
+              const filteredSubmissions = submissions
+                .filter(submission => submission && submission.id && submission.portalUrl)
+              const uniqueSubmissions = filteredSubmissions
+                .filter((submission, index, array) => {
+                  // Deduplicate by portal URL - keep only the first occurrence
+                  return array.findIndex(s => s.portalUrl === submission.portalUrl) === index
+                })
+              
+              console.log(`🔄 CommunityStaking: Deduplicated ${filteredSubmissions.length} submissions to ${uniqueSubmissions.length} unique URLs`)
+              
+              return uniqueSubmissions.map((submission) => {
               const stakeData = calculateStakeRatio(submission.forStake, submission.againstStake)
               const userStakesForSubmission = getUserStakeForSubmission(submission.id)
               const isSubmitter = address === submission.submitterAddress
@@ -355,7 +366,7 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
                   )}
                 </div>
               )
-            })}
+            })()}
           </div>
 
           {/* Staking Form */}
