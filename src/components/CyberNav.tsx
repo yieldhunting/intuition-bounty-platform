@@ -64,7 +64,7 @@ export function CyberNav() {
                     outline: 'none'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.cursor = 'pointer'
+                    (e.target as HTMLElement).style.cursor = 'pointer'
                   }}
                 >
                   <span className="mr-1">{item.icon}</span>
@@ -103,7 +103,7 @@ export function CyberNav() {
                     outline: 'none'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.cursor = 'pointer'
+                    (e.target as HTMLElement).style.cursor = 'pointer'
                   }}
                 >
                   <div>{item.icon}</div>
