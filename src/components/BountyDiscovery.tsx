@@ -305,7 +305,7 @@
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-blue-400">
+                      <h3 className={`text-lg font-semibold ${isReputationBounty ? 'text-purple-400' : 'text-blue-400'}`}>
                         {bounty.title}
                       </h3>
                       {isReputationBounty ? (
@@ -549,27 +549,13 @@
         {/* Submission Modal */}
         {submissionModal.isOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className={`w-full mx-4 ${
-              submissionModal.bountyType === 'reputation' ? 'max-w-4xl' : 'max-w-md'
-            }`}>
-              {submissionModal.bountyType === 'reputation' ? (
-                <ReputationAnalysis
-                  bountyId={submissionModal.bountyId}
-                  bountyTitle={submissionModal.bountyTitle}
-                  targetAtom={submissionModal.targetAtom || 'Unknown Target'}
-                  expertiseRequired={submissionModal.expertiseRequired || 'General Analysis'}
-                  reputationCriteria={submissionModal.reputationCriteria || 'Comprehensive reputation assessment'}
-                  onClose={closeSubmissionModal}
-                  onSubmit={handleAddSubmission}
-                />
-              ) : (
-                <SubmitSolution
-                  bountyId={submissionModal.bountyId}
-                  bountyTitle={submissionModal.bountyTitle}
-                  onClose={closeSubmissionModal}
-                  onSubmit={handleAddSubmission}
-                />
-              )}
+            <div className="w-full mx-4 max-w-md">
+              <SubmitSolution
+                bountyId={submissionModal.bountyId}
+                bountyTitle={submissionModal.bountyTitle}
+                onClose={closeSubmissionModal}
+                onSubmit={handleAddSubmission}
+              />
             </div>
           </div>
         )}
