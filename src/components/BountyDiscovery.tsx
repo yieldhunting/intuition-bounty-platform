@@ -194,6 +194,7 @@
     }
 
     // Get all submissions for a bounty (blockchain + global state submissions)
+    // Deduplicate based on portal URL to avoid showing identical submissions multiple times
     const getAllSubmissions = (bountyId: string) => {
       const blockchainSubmissions = submissionsByBounty[bountyId] || []
       const globalSubs = propSubmissions.filter(sub => sub.bountyId === bountyId) || []
@@ -210,7 +211,16 @@
         console.log(`🔗 Matching submissions:`, globalSubs.map(sub => ({ id: sub.id, title: sub.bountyTitle })))
       }
       
-      return [...blockchainSubmissions, ...globalSubs]
+      // Combine all submissions and deduplicate by portal URL
+      const allSubmissions = [...blockchainSubmissions, ...globalSubs]
+      const uniqueSubmissions = allSubmissions.filter((submission, index, array) => {
+        // Keep submission if it's the first occurrence of this portal URL
+        return array.findIndex(s => s.portalUrl === submission.portalUrl) === index
+      })
+      
+      console.log(`🔄 Deduplicated ${allSubmissions.length} submissions to ${uniqueSubmissions.length} unique URLs`)
+      
+      return uniqueSubmissions
     }
 
     if (loading) {
@@ -416,11 +426,6 @@
                                 <div>
                                   <p className="text-sm text-gray-300 mb-2">
                                     <span className="font-medium">Solution:</span>
-                                    {submission.isLocal && (
-                                      <span className="ml-2 text-xs bg-yellow-600 text-yellow-100 px-2 py-0.5 rounded">
-                                        Local
-                                      </span>
-                                    )}
                                   </p>
                                   <a
                                     href={submission.portalUrl}

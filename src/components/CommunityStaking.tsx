@@ -201,11 +201,6 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-lg font-medium text-white">{submission.bountyTitle || 'Unknown Bounty'}</span>
-                        {submission.isLocal && (
-                          <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-0.5 rounded">
-                            Local
-                          </span>
-                        )}
                         {isSubmitter && (
                           <span className="text-xs bg-blue-600 text-blue-100 px-2 py-0.5 rounded">
                             Your Solution

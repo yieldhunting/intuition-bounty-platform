@@ -62,11 +62,6 @@ export function ReputationAnalysisViewer({ analysis }: ReputationAnalysisViewerP
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-purple-400 font-medium">🏆 Reputation Analysis</span>
-            {analysis.isLocal && (
-              <span className="text-xs bg-yellow-600 text-yellow-100 px-2 py-0.5 rounded">
-                Local
-              </span>
-            )}
           </div>
           <p className="text-sm text-gray-300">
             Target: <span className="font-medium text-white">{analysis.targetAtom}</span>
