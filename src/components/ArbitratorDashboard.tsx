@@ -283,7 +283,7 @@ export function ArbitratorDashboard({ userAddress, isArbitrator = false }: Arbit
                       </div>
                       <div className="text-sm text-gray-300 space-y-1">
                         <p><span className="text-gray-400">Bounty Reward:</span> {submission.bountyReward} tTRUST</p>
-                        <p><span className="text-gray-400">Submitter:</span> {submission.submitterAddress.slice(0, 10)}...{submission.submitterAddress.slice(-6)}</p>
+                        <p><span className="text-gray-400">Submitter:</span> {(submission.submitterAddress || 'Unknown').slice(0, 10)}...{(submission.submitterAddress || 'Unknown').slice(-6)}</p>
                         <p><span className="text-gray-400">Submitted:</span> {new Date(submission.submittedAt).toLocaleDateString()}</p>
                       </div>
                       <a

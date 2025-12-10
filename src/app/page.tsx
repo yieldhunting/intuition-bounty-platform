@@ -116,7 +116,7 @@
       
       // Find bounty from either local state or create fallback title
       const bounty = bounties.find(b => b.id === bountyId)
-      const bountyTitle = bounty?.title || `Bounty ${bountyId.slice(0, 8)}...`
+      const bountyTitle = bounty?.title || `Bounty ${bountyId?.slice(0, 8) || 'Unknown'}...`
       
       const submissionWithBountyTitle: Submission = {
         ...submission,

@@ -431,7 +431,7 @@
                                     {submission.portalUrl}
                                   </a>
                                   <p className="text-xs text-gray-400 mt-2">
-                                    Submitted by: {submission.submitter.slice(0, 10)}...
+                                    Submitted by: {(submission.submitter || submission.submitterAddress || 'Unknown').slice(0, 10)}...
                                   </p>
                                 </div>
 
