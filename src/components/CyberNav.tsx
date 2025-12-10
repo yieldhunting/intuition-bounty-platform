@@ -52,11 +52,20 @@ export function CyberNav() {
                 <button
                   key={item.path}
                   onClick={() => handleNavigation(item.path)}
-                  className={`px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer border-none bg-transparent ${
+                  className={`cyber-nav-button px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer border-none bg-transparent outline-none focus:outline-none hover:cursor-pointer ${
                     isActive
-                      ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50`
-                      : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/5'
+                      ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
+                      : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/5 rounded'
                   }`}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.cursor = 'pointer'
+                  }}
                 >
                   <span className="mr-1">{item.icon}</span>
                   {item.label}
@@ -82,11 +91,20 @@ export function CyberNav() {
                 <button
                   key={item.path}
                   onClick={() => handleNavigation(item.path)}
-                  className={`px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 cursor-pointer border-none bg-transparent block ${
+                  className={`cyber-nav-button px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 cursor-pointer border-none bg-transparent block outline-none focus:outline-none hover:cursor-pointer ${
                     isActive
-                      ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50`
-                      : 'text-gray-400 hover:text-cyan-400'
+                      ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
+                      : 'text-gray-400 hover:text-cyan-400 rounded'
                   }`}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    cursor: 'pointer',
+                    outline: 'none'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.cursor = 'pointer'
+                  }}
                 >
                   <div>{item.icon}</div>
                   <div>{item.label}</div>

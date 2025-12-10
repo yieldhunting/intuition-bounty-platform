@@ -174,3 +174,28 @@ body {
   100% { transform: translateY(100vh); }
 }
 
+/* Navigation button fixes */
+nav button {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+}
+
+nav button:hover {
+  cursor: pointer !important;
+}
+
+nav button:focus {
+  outline: none !important;
+}
+
+/* Ensure navigation buttons are clickable */
+.cyber-nav-button {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
