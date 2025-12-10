@@ -379,7 +379,7 @@
                     href={`https://testnet.explorer.intuition.systems/tx/${bounty.transactionHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-blue-600 text-white px-4 py-1 rounded-md text-sm hover:bg-blue-700"
+                    className="bg-gray-600 text-gray-200 px-4 py-1 rounded-md text-sm hover:bg-gray-500 border border-gray-500"
                   >
                     View on Explorer
                   </a>
@@ -388,7 +388,7 @@
                     className={`px-4 py-1 rounded-md text-sm border transition-colors ${
                       isReputationBounty
                         ? 'bg-purple-600 hover:bg-purple-500 text-white border-purple-500'
-                        : 'bg-gray-600 hover:bg-gray-500 text-gray-200 border-gray-500'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500'
                     }`}
                   >
                     {isReputationBounty ? 'Submit Analysis' : 'Submit Solution'}
