@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useRouter } from 'next/navigation'
 
 interface NavItem {
   path: string
@@ -22,9 +23,15 @@ const navItems: NavItem[] = [
 
 export function CyberNav() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleNavigation = (path: string) => {
+    console.log('Navigating to:', path)
+    router.push(path)
+  }
 
   return (
-    <nav className="cyber-card border-b-2 border-cyan-400/30 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
+    <nav className="cyber-card border-b-2 border-cyan-400/30 backdrop-blur-md fixed top-0 left-0 right-0 z-[9999] pointer-events-auto">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
@@ -42,10 +49,10 @@ export function CyberNav() {
             {navItems.slice(1).map((item) => {
               const isActive = pathname === item.path
               return (
-                <Link
+                <button
                   key={item.path}
-                  href={item.path}
-                  className={`px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
+                  onClick={() => handleNavigation(item.path)}
+                  className={`px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer border-none bg-transparent ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50`
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/5'
@@ -53,7 +60,7 @@ export function CyberNav() {
                 >
                   <span className="mr-1">{item.icon}</span>
                   {item.label}
-                </Link>
+                </button>
               )
             })}
           </div>
@@ -72,10 +79,10 @@ export function CyberNav() {
             {navItems.slice(1).map((item) => {
               const isActive = pathname === item.path
               return (
-                <Link
+                <button
                   key={item.path}
-                  href={item.path}
-                  className={`px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 ${
+                  onClick={() => handleNavigation(item.path)}
+                  className={`px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 cursor-pointer border-none bg-transparent block ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50`
                       : 'text-gray-400 hover:text-cyan-400'
@@ -83,7 +90,7 @@ export function CyberNav() {
                 >
                   <div>{item.icon}</div>
                   <div>{item.label}</div>
-                </Link>
+                </button>
               )
             })}
           </div>
