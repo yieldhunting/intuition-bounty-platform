@@ -41,9 +41,11 @@ export interface GlobalData {
 }
 
 class GlobalDataManager {
-  private baseUrl = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3000' 
-    : 'https://intuition-bounty-platform.vercel.app'
+  private baseUrl = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : (process.env.NODE_ENV === 'development' 
+        ? 'http://localhost:3000' 
+        : 'https://intuition-bounty-platform.vercel.app')
 
   async fetchGlobalData(): Promise<GlobalData> {
     try {

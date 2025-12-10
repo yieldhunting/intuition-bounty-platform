@@ -17,22 +17,27 @@ export default function Terminal() {
   useEffect(() => {
     const loadStats = async () => {
       try {
+        console.log('📊 Loading global stats...')
         const globalData = await globalDataManager.fetchGlobalData()
-        setStats({
-          bounties: globalData.bounties.length,
-          submissions: globalData.submissions.length
-        })
-        console.log('📊 Updated stats - Bounties:', globalData.bounties.length, 'Submissions:', globalData.submissions.length)
+        console.log('📊 Raw global data:', globalData)
+        
+        const newStats = {
+          bounties: globalData.bounties?.length || 0,
+          submissions: globalData.submissions?.length || 0
+        }
+        
+        setStats(newStats)
+        console.log('📊 Updated stats - Bounties:', newStats.bounties, 'Submissions:', newStats.submissions)
       } catch (error) {
-        console.error('Error loading stats:', error)
+        console.error('❌ Error loading stats:', error)
       }
     }
     
     // Load immediately
     loadStats()
     
-    // Refresh every 10 seconds to keep stats current
-    const interval = setInterval(loadStats, 10000)
+    // Refresh every 5 seconds to keep stats current
+    const interval = setInterval(loadStats, 5000)
     return () => clearInterval(interval)
   }, [])
 
@@ -70,6 +75,50 @@ export default function Terminal() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // Test function to add sample data (development only)
+  const addTestData = async () => {
+    try {
+      // Add test bounty
+      const testBounty = {
+        id: `test_bounty_${Date.now()}`,
+        title: 'Test Data Collection Bounty',
+        description: 'Test bounty for verification',
+        reward: 100,
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        category: 'Data Collection',
+        creator: 'Test Creator',
+        creatorAddress: address || '0x1234567890123456789012345678901234567890',
+        submissions: 0,
+        totalStake: 0,
+        atomId: `test_atom_${Date.now()}`,
+        transactionHash: `0x${Date.now().toString(16)}`,
+        createdAt: new Date().toISOString(),
+        bountyType: 'data' as const
+      }
+      
+      await globalDataManager.addBounty(testBounty)
+      
+      // Add test submission
+      const testSubmission = {
+        id: `test_submission_${Date.now()}`,
+        bountyId: testBounty.id,
+        bountyTitle: testBounty.title,
+        submitterAddress: address || '0x1234567890123456789012345678901234567890',
+        portalUrl: 'https://testnet.portal.intuition.systems/explore/list/0x123',
+        submittedAt: new Date().toISOString(),
+        forStake: '0',
+        againstStake: '0',
+        status: 'STAKING_PERIOD',
+        isLocal: true
+      }
+      
+      await globalDataManager.addSubmission(testSubmission)
+      console.log('✅ Added test data successfully')
+    } catch (error) {
+      console.error('❌ Error adding test data:', error)
+    }
+  }
 
   // Animate counter changes
   useEffect(() => {
@@ -191,6 +240,12 @@ export default function Terminal() {
             <div className="cyber-card p-6 text-center">
               <div className="text-3xl font-bold neon-text-pink mb-2">∞</div>
               <div className="text-sm text-gray-400 uppercase tracking-wider">Trust Network</div>
+              <button
+                onClick={addTestData}
+                className="mt-2 text-xs bg-pink-600 text-white px-2 py-1 rounded hover:bg-pink-700"
+              >
+                Add Test Data
+              </button>
             </div>
           </div>
 
