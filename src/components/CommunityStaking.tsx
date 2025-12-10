@@ -58,19 +58,22 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
 
   // Function to resolve bounty title from bounty ID
   const getBountyTitle = (bountyId: string, fallbackTitle?: string): string => {
+    console.log(`🔍 RESOLVING TITLE: bountyId="${bountyId}", fallback="${fallbackTitle}"`)
+    console.log(`📊 Available bounties:`, bounties.map(b => ({ id: b.id, title: b.title })))
+    
     const bounty = bounties.find(b => b.id === bountyId)
     if (bounty?.title) {
-      console.log(`✅ Resolved bounty title for ${bountyId}: "${bounty.title}"`)
+      console.log(`✅ RESOLVED: "${bounty.title}"`)
       return bounty.title
     }
     
     if (fallbackTitle && fallbackTitle !== 'Data Collection Bounty') {
-      console.log(`📝 Using submission fallback title for ${bountyId}: "${fallbackTitle}"`)
+      console.log(`📝 USING FALLBACK: "${fallbackTitle}"`)
       return fallbackTitle
     }
     
-    console.log(`⚠️ No title found for bountyId ${bountyId}, using fallback`)
-    return 'Data Collection Bounty'
+    console.log(`⚠️ NO TITLE FOUND - using default`)
+    return 'Data Collection Bounty [DEBUG: Check Console]'
   }
 
   // Initialize staking manager (for calculating ratios only)
