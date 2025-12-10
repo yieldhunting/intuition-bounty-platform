@@ -300,6 +300,7 @@
             {activeTab === 'community' && (
               <CommunityStaking 
                 submissions={submissions}
+                bounties={bounties}
                 onStakeUpdate={handleStakeUpdate}
               />
             )}

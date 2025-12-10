@@ -17,12 +17,33 @@ interface Submission {
   isLocal?: boolean
 }
 
+interface Bounty {
+  id: string
+  title: string
+  description: string
+  reward: number
+  deadline: string
+  category: string
+  creator: string
+  creatorAddress: string
+  submissions: number
+  totalStake: number
+  atomId: string
+  transactionHash: string
+  createdAt: string
+  bountyType?: 'data' | 'reputation'
+  targetAtom?: string
+  expertiseRequired?: string
+  reputationCriteria?: string
+}
+
 interface CommunityStakingProps {
   submissions: Submission[]
+  bounties?: Bounty[]  // Add bounties for title resolution
   onStakeUpdate?: (submissionId: string, forStake: bigint, againstStake: bigint) => void
 }
 
-export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakingProps) {
+export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: CommunityStakingProps) {
   const { address, isConnected, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
@@ -34,6 +55,23 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<string>('')
   const [userStakes, setUserStakes] = useState<StakePosition[]>([])
+
+  // Function to resolve bounty title from bounty ID
+  const getBountyTitle = (bountyId: string, fallbackTitle?: string): string => {
+    const bounty = bounties.find(b => b.id === bountyId)
+    if (bounty?.title) {
+      console.log(`✅ Resolved bounty title for ${bountyId}: "${bounty.title}"`)
+      return bounty.title
+    }
+    
+    if (fallbackTitle && fallbackTitle !== 'Data Collection Bounty') {
+      console.log(`📝 Using submission fallback title for ${bountyId}: "${fallbackTitle}"`)
+      return fallbackTitle
+    }
+    
+    console.log(`⚠️ No title found for bountyId ${bountyId}, using fallback`)
+    return 'Data Collection Bounty'
+  }
 
   // Initialize staking manager (for calculating ratios only)
   useEffect(() => {
@@ -200,7 +238,7 @@ export function CommunityStaking({ submissions, onStakeUpdate }: CommunityStakin
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-lg font-medium text-white">{submission.bountyTitle || 'Unknown Bounty'}</span>
+                        <span className="text-lg font-medium text-white">{getBountyTitle(submission.bountyId, submission.bountyTitle)}</span>
                         {isSubmitter && (
                           <span className="text-xs bg-blue-600 text-blue-100 px-2 py-0.5 rounded">
                             Your Solution
