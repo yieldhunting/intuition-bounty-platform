@@ -105,12 +105,19 @@
     
     const allBountiesWithMissing = [...allBounties, ...missingBounties]
     
+    // Deduplicate bounties by title to prevent duplicate "Intuition Use Cases" etc.
+    const uniqueBounties = allBountiesWithMissing.filter((bounty, index, array) => {
+      // Keep bounty if it's the first occurrence of this title
+      return array.findIndex(b => b.title === bounty.title) === index
+    })
+    
     // Debug logging
     console.log(`🔍 BountyDiscovery Debug:`)
     console.log(`   PropBounties: ${propBounties.length}`, propBounties.map(b => ({ id: b.id, title: b.title })))
     console.log(`   GraphQLBounties: ${graphqlBounties.length}`, graphqlBounties.map(b => ({ id: b.id, title: b.title })))
     console.log(`   MissingBounties: ${missingBounties.length}`, missingBounties.map(b => ({ id: b.id, title: b.title })))
     console.log(`   AllBounties: ${allBountiesWithMissing.length}`)
+    console.log(`   UniqueBounties: ${uniqueBounties.length} (deduplicated by title)`)
     console.log(`   PropSubmissions: ${propSubmissions.length}`, propSubmissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
 
     // Fetch real bounties from Intuition
@@ -152,8 +159,8 @@
       fetchBounties()
     }, [])
 
-    // Filter and sort bounties
-    const filteredBounties = allBountiesWithMissing
+    // Filter and sort bounties (using deduplicated unique bounties)
+    const filteredBounties = uniqueBounties
       .sort((a, b) => {
         if (sortBy === 'reward') return b.reward - a.reward
         if (sortBy === 'deadline') return new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
