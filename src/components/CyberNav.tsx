@@ -59,8 +59,8 @@ export function CyberNav() {
           </div>
 
           {/* Wallet Connection */}
-          <div className="flex items-center">
-            <div className="scale-75 origin-right">
+          <div className="flex items-center -mr-4">
+            <div className="scale-60 origin-right">
               <ConnectButton />
             </div>
           </div>
