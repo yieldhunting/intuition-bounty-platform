@@ -379,7 +379,8 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
                   )}
                 </div>
               )
-            })()}
+            })
+          })()}
           </div>
 
           {/* Staking Form */}
