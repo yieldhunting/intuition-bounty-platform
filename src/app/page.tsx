@@ -10,6 +10,7 @@
   import { ArbitratorDashboard } from '@/components/ArbitratorDashboard'
   import { AutomatedResolution } from '@/components/AutomatedResolution'
   import { ReputationSystem } from '@/components/ReputationSystem'
+  import { globalDataManager, GlobalSubmission, GlobalBounty } from '@/lib/globalData'
 
   interface Bounty {
     id: string
@@ -53,64 +54,67 @@
     const [submissions, setSubmissions] = useState<Submission[]>([])
     const [isHydrated, setIsHydrated] = useState(false)
 
-    // Load data from localStorage on mount
+    // Load data from global storage on mount
     useEffect(() => {
-      try {
-        const savedBounties = localStorage.getItem('intuition-bounties')
-        const savedSubmissions = localStorage.getItem('intuition-submissions')
-        
-        if (savedBounties) {
-          const parsedBounties = JSON.parse(savedBounties)
-          setBounties(parsedBounties)
-          console.log('📋 Loaded bounties from localStorage:', parsedBounties.length)
-        }
-        
-        if (savedSubmissions) {
-          const parsedSubmissions = JSON.parse(savedSubmissions)
-          // Convert BigInt strings back to BigInt
-          const submissionsWithBigInt = parsedSubmissions.map((sub: any) => ({
+      const loadGlobalData = async () => {
+        try {
+          const globalData = await globalDataManager.fetchGlobalData()
+          
+          // Convert global bounties to local format
+          setBounties(globalData.bounties)
+          console.log('📋 Loaded bounties from global storage:', globalData.bounties.length)
+          
+          // Convert global submissions to local format with BigInt conversion
+          const submissionsWithBigInt = globalData.submissions.map((sub: GlobalSubmission) => ({
             ...sub,
-            forStake: BigInt(sub.forStake || 0),
-            againstStake: BigInt(sub.againstStake || 0)
+            forStake: BigInt(sub.forStake || '0'),
+            againstStake: BigInt(sub.againstStake || '0')
           }))
-          setSubmissions(submissionsWithBigInt)
-          console.log('📝 Loaded submissions from localStorage:', submissionsWithBigInt.length)
+          
+          // Apply any stake updates from global stakes
+          const updatedSubmissions = submissionsWithBigInt.map(sub => {
+            const stakeUpdate = globalData.stakes[sub.id]
+            if (stakeUpdate) {
+              return {
+                ...sub,
+                forStake: BigInt(stakeUpdate.forStake),
+                againstStake: BigInt(stakeUpdate.againstStake)
+              }
+            }
+            return sub
+          })
+          
+          setSubmissions(updatedSubmissions)
+          console.log('📝 Loaded submissions from global storage:', updatedSubmissions.length)
+          
+        } catch (error) {
+          console.error('Error loading from global storage:', error)
         }
-      } catch (error) {
-        console.error('Error loading from localStorage:', error)
+        setIsHydrated(true)
       }
-      setIsHydrated(true)
+      
+      loadGlobalData()
     }, [])
 
-    // Save bounties to localStorage whenever they change
-    useEffect(() => {
-      if (isHydrated) {
-        localStorage.setItem('intuition-bounties', JSON.stringify(bounties))
-        console.log('💾 Saved bounties to localStorage:', bounties.length)
-      }
-    }, [bounties, isHydrated])
-
-    // Save submissions to localStorage whenever they change
-    useEffect(() => {
-      if (isHydrated) {
-        // Convert BigInt to strings for JSON serialization
-        const submissionsForStorage = submissions.map(sub => ({
-          ...sub,
-          forStake: sub.forStake.toString(),
-          againstStake: sub.againstStake.toString()
-        }))
-        localStorage.setItem('intuition-submissions', JSON.stringify(submissionsForStorage))
-        console.log('💾 Saved submissions to localStorage:', submissions.length)
-      }
-    }, [submissions, isHydrated])
+    // Note: Global storage is handled by individual actions (adding bounties/submissions/stakes)
+    // No need for automatic saving since each action immediately updates global state
 
     // Handler for adding a new bounty
-    const handleBountyCreated = (bounty: Bounty) => {
+    const handleBountyCreated = async (bounty: Bounty) => {
+      // Update local state immediately
       setBounties(prev => [bounty, ...prev])
+      
+      // Save to global storage
+      try {
+        await globalDataManager.addBounty(bounty as GlobalBounty)
+        console.log('💾 Saved bounty to global storage:', bounty.title)
+      } catch (error) {
+        console.error('Error saving bounty to global storage:', error)
+      }
     }
 
     // Handler for adding a new submission
-    const handleSubmissionCreated = (submission: Omit<Submission, 'bountyTitle'>, bountyId: string) => {
+    const handleSubmissionCreated = async (submission: Omit<Submission, 'bountyTitle'>, bountyId: string) => {
       console.log('🔍 Adding submission for bountyId:', bountyId)
       console.log('📋 Available bounties:', bounties.map(b => ({ id: b.id, title: b.title })))
       
@@ -126,12 +130,27 @@
         status: SubmissionStatus.STAKING_PERIOD
       }
       
+      // Update local state immediately
       console.log('✅ Created submission with title:', bountyTitle)
       setSubmissions(prev => [submissionWithBountyTitle, ...prev])
+      
+      // Save to global storage
+      try {
+        const globalSubmission: GlobalSubmission = {
+          ...submissionWithBountyTitle,
+          forStake: '0',
+          againstStake: '0'
+        }
+        await globalDataManager.addSubmission(globalSubmission)
+        console.log('💾 Saved submission to global storage:', submissionWithBountyTitle.id)
+      } catch (error) {
+        console.error('Error saving submission to global storage:', error)
+      }
     }
 
     // Handler for updating submission stakes
-    const handleStakeUpdate = (submissionId: string, newForStake: bigint, newAgainstStake: bigint) => {
+    const handleStakeUpdate = async (submissionId: string, newForStake: bigint, newAgainstStake: bigint) => {
+      // Update local state immediately
       setSubmissions(prev => 
         prev.map(submission => 
           submission.id === submissionId 
@@ -139,15 +158,30 @@
             : submission
         )
       )
+      
+      // Save to global storage
+      try {
+        await globalDataManager.updateStake(
+          submissionId, 
+          newForStake.toString(), 
+          newAgainstStake.toString()
+        )
+        console.log('💾 Updated stake in global storage:', submissionId)
+      } catch (error) {
+        console.error('Error updating stake in global storage:', error)
+      }
     }
 
-    // Debug function to clear localStorage (only for development)
-    const clearLocalStorage = () => {
-      localStorage.removeItem('intuition-bounties')
-      localStorage.removeItem('intuition-submissions')
-      setBounties([])
-      setSubmissions([])
-      console.log('🗑️ Cleared all localStorage data')
+    // Debug function to clear global storage (only for development)
+    const clearGlobalStorage = async () => {
+      try {
+        await globalDataManager.resetData()
+        setBounties([])
+        setSubmissions([])
+        console.log('🗑️ Cleared all global storage data')
+      } catch (error) {
+        console.error('Error clearing global storage:', error)
+      }
     }
 
     // Determine if user has admin/arbitrator privileges (mock logic)
@@ -189,10 +223,10 @@
           {process.env.NODE_ENV === 'development' && (
             <div className="text-center mb-4">
               <button
-                onClick={clearLocalStorage}
+                onClick={clearGlobalStorage}
                 className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
               >
-                🗑️ Clear Storage (Dev Only)
+                🗑️ Clear Global Storage (Dev Only)
               </button>
               <p className="text-xs text-gray-500 mt-1">
                 Bounties: {bounties.length} | Submissions: {submissions.length}
