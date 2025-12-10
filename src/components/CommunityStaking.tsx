@@ -56,6 +56,12 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
   const [result, setResult] = useState<string>('')
   const [userStakes, setUserStakes] = useState<StakePosition[]>([])
 
+  // Function to check if URL is testnet
+  const isTestnetUrl = (url: string): boolean => {
+    return url.includes('testnet.portal.intuition.systems') || 
+           (!url.includes('portal.intuition.systems') || url.includes('testnet'))
+  }
+
   // Function to resolve bounty title from bounty ID
   const getBountyTitle = (bountyId: string, fallbackTitle?: string): string => {
     console.log(`🔍 RESOLVING TITLE: bountyId="${bountyId}", fallback="${fallbackTitle}"`)
@@ -253,13 +259,20 @@ export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: 
             {(() => {
               const filteredSubmissions = submissions
                 .filter(submission => submission && submission.id && submission.portalUrl)
+                .filter(submission => {
+                  const isTestnet = isTestnetUrl(submission.portalUrl)
+                  if (!isTestnet) {
+                    console.log(`🚫 Filtering out mainnet URL: ${submission.portalUrl}`)
+                  }
+                  return isTestnet
+                })
               const uniqueSubmissions = filteredSubmissions
                 .filter((submission, index, array) => {
                   // Deduplicate by portal URL - keep only the first occurrence
                   return array.findIndex(s => s.portalUrl === submission.portalUrl) === index
                 })
               
-              console.log(`🔄 CommunityStaking: Deduplicated ${filteredSubmissions.length} submissions to ${uniqueSubmissions.length} unique URLs`)
+              console.log(`🔄 CommunityStaking: Filtered to ${filteredSubmissions.length} testnet submissions, deduplicated to ${uniqueSubmissions.length} unique URLs`)
               
               return uniqueSubmissions.map((submission) => {
               const stakeData = calculateStakeRatio(submission.forStake, submission.againstStake)

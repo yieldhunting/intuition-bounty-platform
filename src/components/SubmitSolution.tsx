@@ -17,12 +17,26 @@
     const [isLoading, setIsLoading] = useState(false)
     const [result, setResult] = useState<string>('')
 
-    const validatePortalUrl = (url: string): boolean => {
-      return url.includes('intuition.systems') && (
-        url.includes('/explore/list/') ||
-        url.includes('/list/') ||
-        url.includes('0x')
-      )
+    const validatePortalUrl = (url: string): { isValid: boolean, error?: string } => {
+      // Check if URL contains intuition.systems
+      if (!url.includes('intuition.systems')) {
+        return { isValid: false, error: 'URL must be from intuition.systems' }
+      }
+      
+      // Check if it's testnet (not mainnet)
+      if (!url.includes('testnet.portal.intuition.systems')) {
+        if (url.includes('portal.intuition.systems') && !url.includes('testnet')) {
+          return { isValid: false, error: 'Only testnet Portal URLs are accepted. Please use testnet.portal.intuition.systems' }
+        }
+      }
+      
+      // Check if it contains list structure
+      const hasListStructure = url.includes('/explore/list/') || url.includes('/list/') || url.includes('0x')
+      if (!hasListStructure) {
+        return { isValid: false, error: 'URL must contain a list or data identifier' }
+      }
+      
+      return { isValid: true }
     }
 
     const handleSubmitSolution = async () => {
@@ -31,8 +45,9 @@
         return
       }
 
-      if (!validatePortalUrl(portalUrl)) {
-        alert('Please enter a valid Intuition Portal URL that contains a list or data identifier')
+      const validation = validatePortalUrl(portalUrl)
+      if (!validation.isValid) {
+        alert(validation.error || 'Please enter a valid Portal URL')
         return
       }
 
@@ -111,7 +126,7 @@
   focus:ring-blue-500 focus:border-blue-500"
             />
             <p className="text-xs text-gray-400 mt-1">
-              URL should link directly to your data list in Intuition Testnet Portal
+              URL must be from testnet.portal.intuition.systems - mainnet URLs will be rejected
             </p>
           </div>
 

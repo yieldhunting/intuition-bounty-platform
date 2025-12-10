@@ -53,6 +53,13 @@
     const [sortBy, setSortBy] = useState('newest')
     const [submissionsByBounty, setSubmissionsByBounty] = useState<{ [bountyId: string]: any[] }>({})
     const [expandedSubmissions, setExpandedSubmissions] = useState<{ [bountyId: string]: boolean }>({})
+    
+    // Function to check if URL is testnet
+    const isTestnetUrl = (url: string): boolean => {
+      return url.includes('testnet.portal.intuition.systems') || 
+             (!url.includes('portal.intuition.systems') || url.includes('testnet'))
+    }
+    
     const [submissionModal, setSubmissionModal] = useState<{
       isOpen: boolean
       bountyId: string
@@ -211,14 +218,21 @@
         console.log(`🔗 Matching submissions:`, globalSubs.map(sub => ({ id: sub.id, title: sub.bountyTitle })))
       }
       
-      // Combine all submissions and deduplicate by portal URL
+      // Combine all submissions, filter testnet only, and deduplicate by portal URL
       const allSubmissions = [...blockchainSubmissions, ...globalSubs]
-      const uniqueSubmissions = allSubmissions.filter((submission, index, array) => {
+      const testnetSubmissions = allSubmissions.filter(submission => {
+        const isTestnet = isTestnetUrl(submission.portalUrl)
+        if (!isTestnet) {
+          console.log(`🚫 BountyDiscovery: Filtering out mainnet URL: ${submission.portalUrl}`)
+        }
+        return isTestnet
+      })
+      const uniqueSubmissions = testnetSubmissions.filter((submission, index, array) => {
         // Keep submission if it's the first occurrence of this portal URL
         return array.findIndex(s => s.portalUrl === submission.portalUrl) === index
       })
       
-      console.log(`🔄 Deduplicated ${allSubmissions.length} submissions to ${uniqueSubmissions.length} unique URLs`)
+      console.log(`🔄 BountyDiscovery: Filtered ${allSubmissions.length} submissions to ${testnetSubmissions.length} testnet, deduplicated to ${uniqueSubmissions.length} unique URLs`)
       
       return uniqueSubmissions
     }
