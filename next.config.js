@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Add empty turbopack config to suppress the Next.js 16 warning
+  turbopack: {},
   
   webpack: (config, { isServer, webpack }) => {
     // Exclude problematic viem test decorators completely
