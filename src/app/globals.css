@@ -2,86 +2,168 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  --neon-cyan: #00ffff;
+  --neon-pink: #ff00ff;
+  --neon-green: #00ff00;
+  --neon-orange: #ff6600;
+  --neon-purple: #8a2be2;
+  --dark-bg: #0a0a0f;
+  --darker-bg: #050508;
+  --grid-color: #1a1a2e;
 }
 
 body {
   background: 
-    radial-gradient(circle at 20% 30%, rgb(79, 70, 229) 0%, rgba(79, 70, 229, 0.6) 30%, rgba(79, 70, 229, 0.2) 60%, transparent 80%) !important,
-    radial-gradient(circle at 80% 70%, rgb(147, 51, 234) 0%, rgba(147, 51, 234, 0.6) 30%, rgba(147, 51, 234, 0.2) 60%, transparent 80%) !important,
-    radial-gradient(circle at 60% 20%, rgb(59, 130, 246) 0%, rgba(59, 130, 246, 0.4) 25%, transparent 50%) !important,
-    radial-gradient(circle at 40% 80%, rgb(168, 85, 247) 0%, rgba(168, 85, 247, 0.4) 25%, transparent 50%) !important,
-    radial-gradient(circle at 50% 50%, rgb(34, 197, 94) 0%, rgba(34, 197, 94, 0.3) 20%, transparent 40%) !important,
-    linear-gradient(135deg, 
-      rgb(30, 41, 59) 0%, 
-      rgb(15, 23, 42) 25%,
-      rgb(51, 65, 85) 50%,
-      rgb(15, 23, 42) 75%,
-      rgb(30, 41, 59) 100%
-    ) !important;
-  background-attachment: fixed !important;
-  background-size: 100% 100%, 100% 100%, 80% 80%, 80% 80%, 60% 60%, 100% 100% !important;
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    linear-gradient(45deg, 
+      rgba(0, 255, 255, 0.03) 0%,
+      transparent 25%,
+      rgba(255, 0, 255, 0.03) 50%,
+      transparent 75%,
+      rgba(0, 255, 0, 0.03) 100%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 80px,
+      rgba(0, 255, 255, 0.02) 80px,
+      rgba(0, 255, 255, 0.02) 81px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 80px,
+      rgba(255, 0, 255, 0.02) 80px,
+      rgba(255, 0, 255, 0.02) 81px
+    ),
+    radial-gradient(circle at 20% 30%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 0, 0.05) 0%, transparent 30%),
+    #0a0a0f;
+  color: #e0e6ff;
+  font-family: 'Rajdhani', sans-serif;
   min-height: 100vh;
+  background-attachment: fixed;
 }
 
-/* Add enhanced texture overlay */
-body::before {
+/* Cyberpunk glow effects */
+.cyber-glow {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+}
+
+.cyber-border {
+  border: 1px solid var(--neon-cyan);
+  box-shadow: 
+    0 0 5px var(--neon-cyan),
+    inset 0 0 5px rgba(0, 255, 255, 0.1);
+}
+
+.cyber-button {
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.05));
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.cyber-button:hover {
+  background: rgba(0, 255, 255, 0.2);
+  box-shadow: 
+    0 0 15px var(--neon-cyan),
+    inset 0 0 15px rgba(0, 255, 255, 0.1);
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.cyber-card {
+  background: linear-gradient(135deg, 
+    rgba(10, 10, 15, 0.9) 0%,
+    rgba(26, 26, 46, 0.7) 100%
+  );
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.neon-text-cyan {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.neon-text-pink {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.neon-text-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green);
+}
+
+.neon-text-orange {
+  color: var(--neon-orange);
+  text-shadow: 0 0 10px var(--neon-orange);
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Animated scanlines */
+.scanlines {
+  position: relative;
+}
+
+.scanlines::before {
   content: '';
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0),
-    radial-gradient(circle at 20px 20px, rgba(79, 70, 229, 0.03) 1px, transparent 0);
-  background-size: 30px 30px, 60px 60px;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 255, 0.03) 50%,
+    rgba(0, 255, 255, 0.05) 51%,
+    transparent 52%
+  );
+  background-size: 100% 4px;
+  animation: scanline 0.1s linear infinite;
   pointer-events: none;
-  z-index: -1;
 }
 
-/* Add a visible test indicator to confirm CSS is loading */
+@keyframes scanline {
+  0% { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Cyberpunk visual indicator */
 body::after {
-  content: '🎨 BACKGROUND ACTIVE';
+  content: '◉ SYSTEM ONLINE';
   position: fixed;
-  top: 10px;
-  right: 10px;
-  background: rgba(79, 70, 229, 0.8);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(45deg, rgba(0, 255, 255, 0.2), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  padding: 6px 12px;
   font-size: 10px;
+  font-family: 'Orbitron', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
   z-index: 1000;
   pointer-events: none;
-}
-
-/* Force background on all possible elements */
-html {
-  background: 
-    radial-gradient(circle at 20% 30%, rgb(79, 70, 229) 0%, rgba(79, 70, 229, 0.6) 30%, rgba(79, 70, 229, 0.2) 60%, transparent 80%) !important,
-    radial-gradient(circle at 80% 70%, rgb(147, 51, 234) 0%, rgba(147, 51, 234, 0.6) 30%, rgba(147, 51, 234, 0.2) 60%, transparent 80%) !important,
-    radial-gradient(circle at 60% 20%, rgb(59, 130, 246) 0%, rgba(59, 130, 246, 0.4) 25%, transparent 50%) !important,
-    radial-gradient(circle at 40% 80%, rgb(168, 85, 247) 0%, rgba(168, 85, 247, 0.4) 25%, transparent 50%) !important,
-    radial-gradient(circle at 50% 50%, rgb(34, 197, 94) 0%, rgba(34, 197, 94, 0.3) 20%, transparent 40%) !important,
-    linear-gradient(135deg, 
-      rgb(30, 41, 59) 0%, 
-      rgb(15, 23, 42) 25%,
-      rgb(51, 65, 85) 50%,
-      rgb(15, 23, 42) 75%,
-      rgb(30, 41, 59) 100%
-    ) !important;
-  background-attachment: fixed !important;
-  min-height: 100vh;
-}
-
-#__next {
-  background: transparent !important;
-}
-
-main {
-  background: transparent !important;
+  box-shadow: 0 0 10px var(--neon-cyan);
+  text-shadow: 0 0 5px var(--neon-cyan);
 }
