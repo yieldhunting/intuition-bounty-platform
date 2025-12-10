@@ -9,10 +9,11 @@ import Link from 'next/link'
 export default function Terminal() {
   const { address, isConnected } = useAccount()
   const [stats, setStats] = useState({ bounties: 0, submissions: 0 })
+  const [displayStats, setDisplayStats] = useState({ bounties: 0, submissions: 0 })
   const [terminalText, setTerminalText] = useState('')
   const [currentTime, setCurrentTime] = useState(new Date())
 
-  // Load global stats
+  // Load global stats and refresh periodically
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -21,11 +22,18 @@ export default function Terminal() {
           bounties: globalData.bounties.length,
           submissions: globalData.submissions.length
         })
+        console.log('📊 Updated stats - Bounties:', globalData.bounties.length, 'Submissions:', globalData.submissions.length)
       } catch (error) {
         console.error('Error loading stats:', error)
       }
     }
+    
+    // Load immediately
     loadStats()
+    
+    // Refresh every 10 seconds to keep stats current
+    const interval = setInterval(loadStats, 10000)
+    return () => clearInterval(interval)
   }, [])
 
   // Terminal animation effect
@@ -62,6 +70,35 @@ export default function Terminal() {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
   }, [])
+
+  // Animate counter changes
+  useEffect(() => {
+    const animateCounter = (key: 'bounties' | 'submissions') => {
+      const start = displayStats[key]
+      const end = stats[key]
+      const duration = 1000 // 1 second animation
+      const startTime = Date.now()
+      
+      const updateCounter = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const current = Math.floor(start + (end - start) * progress)
+        
+        setDisplayStats(prev => ({ ...prev, [key]: current }))
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter)
+        }
+      }
+      
+      if (start !== end) {
+        updateCounter()
+      }
+    }
+    
+    animateCounter('bounties')
+    animateCounter('submissions')
+  }, [stats, displayStats])
 
   const QuickAction = ({ href, title, description, icon, color }: {
     href: string
@@ -132,11 +169,15 @@ export default function Terminal() {
           {/* System Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="cyber-card p-6 text-center">
-              <div className="text-3xl font-bold neon-text-cyan mb-2">{stats.bounties}</div>
+              <div className="text-3xl font-bold neon-text-cyan mb-2 transition-all duration-300">
+                {displayStats.bounties}
+              </div>
               <div className="text-sm text-gray-400 uppercase tracking-wider">Active Bounties</div>
             </div>
             <div className="cyber-card p-6 text-center">
-              <div className="text-3xl font-bold neon-text-green mb-2">{stats.submissions}</div>
+              <div className="text-3xl font-bold neon-text-green mb-2 transition-all duration-300">
+                {displayStats.submissions}
+              </div>
               <div className="text-sm text-gray-400 uppercase tracking-wider">Submissions</div>
             </div>
             <div className="cyber-card p-6 text-center">
