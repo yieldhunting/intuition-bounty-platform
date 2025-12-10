@@ -51,7 +51,7 @@ export default function CreatePage() {
     <div className="min-h-screen scanlines cyber-grid">
       <CyberNav />
       
-      <main className="pt-20 px-6 pb-12">
+      <main className="pt-16 px-6 pb-12">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="cyber-card p-8 mb-8">

@@ -25,33 +25,33 @@ export function CyberNav() {
 
   return (
     <nav className="cyber-card border-b-2 border-cyan-400/30 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 cyber-grid bg-cyan-400/20 border border-cyan-400 flex items-center justify-center">
-              <span className="text-cyan-400 font-bold text-sm">◉</span>
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="w-6 h-6 cyber-grid bg-cyan-400/20 border border-cyan-400 flex items-center justify-center">
+              <span className="text-cyan-400 font-bold text-xs">◉</span>
             </div>
-            <span className="font-orbitron text-lg neon-text-cyan font-bold tracking-wider">
+            <span className="font-mono text-sm neon-text-cyan font-bold tracking-wide">
               INTUITION.SYS
             </span>
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navItems.map((item) => {
+          <div className="hidden md:flex items-center space-x-6 flex-1 justify-center">
+            {navItems.slice(1).map((item) => {
               const isActive = pathname === item.path
               return (
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`px-4 py-2 text-sm font-medium uppercase tracking-wider transition-all duration-300 ${
+                  className={`px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50`
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/5'
                   }`}
                 >
-                  <span className="mr-2">{item.icon}</span>
+                  <span className="mr-1">{item.icon}</span>
                   {item.label}
                 </Link>
               )
@@ -59,8 +59,8 @@ export function CyberNav() {
           </div>
 
           {/* Wallet Connection */}
-          <div className="flex items-center space-x-4">
-            <div className="cyber-button p-1">
+          <div className="flex items-center">
+            <div className="scale-75 origin-right">
               <ConnectButton />
             </div>
           </div>
