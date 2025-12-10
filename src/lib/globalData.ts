@@ -49,48 +49,93 @@ class GlobalDataManager {
 
   async fetchGlobalData(): Promise<GlobalData> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/global-data`)
-      if (!response.ok) throw new Error('Failed to fetch global data')
-      const data = await response.json()
+      console.log('📊 Fetching global data from:', `${this.baseUrl}/api/global-data`)
       
-      // Also fetch GraphQL data to get complete picture
+      const response = await fetch(`${this.baseUrl}/api/global-data`, {
+        cache: 'no-store' // Ensure fresh data
+      })
+      
+      if (!response.ok) {
+        console.warn('Failed to fetch global data:', response.status, response.statusText)
+        throw new Error(`Failed to fetch global data: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      console.log('📊 Base data fetched - Bounties:', data.bounties?.length || 0, 'Submissions:', data.submissions?.length || 0)
+      
+      // Try to fetch GraphQL data for additional bounties
       try {
+        console.log('📊 Attempting to fetch GraphQL data...')
         const { graphqlClient, GET_BOUNTIES_QUERY, transformAtomToBounty, groupSubmissionsByBounty } = await import('./graphql')
         
-        const graphqlResponse = await graphqlClient.request(GET_BOUNTIES_QUERY, { limit: 50 })
-        const graphqlBounties = graphqlResponse.atoms
-          .map(transformAtomToBounty)
-          .filter((bounty: any) => bounty !== null)
+        const graphqlResponse = await graphqlClient.request(GET_BOUNTIES_QUERY, { limit: 100 })
         
-        const graphqlSubmissions = groupSubmissionsByBounty(graphqlResponse.atoms)
-        const flatSubmissions = Object.values(graphqlSubmissions).flat()
-        
-        console.log('📊 GlobalData: Found', graphqlBounties.length, 'GraphQL bounties and', flatSubmissions.length, 'GraphQL submissions')
-        
-        // Combine with global storage data
-        return {
-          submissions: [...data.submissions, ...flatSubmissions.map((sub: any) => ({
-            id: sub.id || `graphql_${Date.now()}_${Math.random()}`,
-            bountyId: sub.bountyId,
-            bountyTitle: sub.title || 'GraphQL Submission',
-            submitterAddress: sub.submitter || 'Unknown',
-            portalUrl: sub.portalUrl || '',
-            submittedAt: sub.submittedAt || new Date().toISOString(),
-            forStake: '0',
-            againstStake: '0',
-            status: 'STAKING_PERIOD',
-            isLocal: false
-          }))],
-          bounties: [...data.bounties, ...graphqlBounties],
-          stakes: data.stakes
+        if (graphqlResponse?.atoms) {
+          const graphqlBounties = graphqlResponse.atoms
+            .map(transformAtomToBounty)
+            .filter((bounty: any) => bounty !== null)
+          
+          const graphqlSubmissions = groupSubmissionsByBounty(graphqlResponse.atoms)
+          const flatSubmissions = Object.values(graphqlSubmissions).flat()
+          
+          console.log('📊 GraphQL data fetched - Bounties:', graphqlBounties.length, 'Submissions:', flatSubmissions.length)
+          
+          // Combine with global storage data (deduplicate by ID)
+          const combinedBounties = [...data.bounties]
+          const bountyIds = new Set(data.bounties.map((b: any) => b.id))
+          
+          graphqlBounties.forEach((bounty: any) => {
+            if (!bountyIds.has(bounty.id)) {
+              combinedBounties.push(bounty)
+            }
+          })
+          
+          const combinedSubmissions = [...data.submissions]
+          const submissionIds = new Set(data.submissions.map((s: any) => s.id))
+          
+          flatSubmissions.forEach((sub: any) => {
+            const submissionData = {
+              id: sub.id || `graphql_${Date.now()}_${Math.random()}`,
+              bountyId: sub.bountyId,
+              bountyTitle: sub.title || 'GraphQL Submission',
+              submitterAddress: sub.submitter || 'Unknown',
+              portalUrl: sub.portalUrl || '',
+              submittedAt: sub.submittedAt || new Date().toISOString(),
+              forStake: '0',
+              againstStake: '0',
+              status: 'STAKING_PERIOD',
+              isLocal: false
+            }
+            
+            if (!submissionIds.has(submissionData.id)) {
+              combinedSubmissions.push(submissionData)
+            }
+          })
+          
+          const result = {
+            submissions: combinedSubmissions,
+            bounties: combinedBounties,
+            stakes: data.stakes
+          }
+          
+          console.log('📊 Combined data - Total Bounties:', result.bounties.length, 'Total Submissions:', result.submissions.length)
+          return result
         }
       } catch (graphqlError) {
-        console.warn('Failed to fetch GraphQL data:', graphqlError)
-        return data
+        console.warn('GraphQL fetch failed (using base data):', graphqlError)
       }
+      
+      console.log('📊 Using base data only - Bounties:', data.bounties?.length || 0, 'Submissions:', data.submissions?.length || 0)
+      return data
+      
     } catch (error) {
-      console.error('Error fetching global data:', error)
-      return { submissions: [], bounties: [], stakes: {} }
+      console.error('❌ Error fetching global data:', error)
+      // Return minimal fallback data instead of empty
+      return { 
+        submissions: [], 
+        bounties: [], 
+        stakes: {} 
+      }
     }
   }
 

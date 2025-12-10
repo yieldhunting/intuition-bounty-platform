@@ -12,11 +12,14 @@ export default function Terminal() {
   const [displayStats, setDisplayStats] = useState({ bounties: 0, submissions: 0 })
   const [terminalText, setTerminalText] = useState('')
   const [currentTime, setCurrentTime] = useState(new Date())
+  const [isLoading, setIsLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   // Load global stats and refresh periodically
   useEffect(() => {
     const loadStats = async () => {
       try {
+        setIsLoading(true)
         console.log('📊 Loading global stats...')
         const globalData = await globalDataManager.fetchGlobalData()
         console.log('📊 Raw global data:', globalData)
@@ -27,17 +30,20 @@ export default function Terminal() {
         }
         
         setStats(newStats)
+        setLastUpdated(new Date())
+        setIsLoading(false)
         console.log('📊 Updated stats - Bounties:', newStats.bounties, 'Submissions:', newStats.submissions)
       } catch (error) {
         console.error('❌ Error loading stats:', error)
+        setIsLoading(false)
       }
     }
     
     // Load immediately
     loadStats()
     
-    // Refresh every 5 seconds to keep stats current
-    const interval = setInterval(loadStats, 5000)
+    // Refresh every 10 seconds to keep stats current
+    const interval = setInterval(loadStats, 10000)
     return () => clearInterval(interval)
   }, [])
 
@@ -217,34 +223,68 @@ export default function Terminal() {
 
           {/* System Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="cyber-card p-6 text-center">
-              <div className="text-3xl font-bold neon-text-cyan mb-2 transition-all duration-300">
-                {displayStats.bounties}
+            <div className="cyber-card p-6 text-center relative">
+              <div className="text-4xl font-bold neon-text-cyan mb-2 transition-all duration-300">
+                {isLoading ? (
+                  <div className="animate-pulse">•••</div>
+                ) : (
+                  displayStats.bounties
+                )}
               </div>
-              <div className="text-sm text-gray-400 uppercase tracking-wider">Active Bounties</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Active Bounties</div>
+              {lastUpdated && !isLoading && (
+                <div className="text-xs text-cyan-500/70">
+                  Live • Updated {lastUpdated.toLocaleTimeString()}
+                </div>
+              )}
+              {isLoading && (
+                <div className="text-xs text-cyan-500/70 animate-pulse">
+                  Syncing...
+                </div>
+              )}
             </div>
-            <div className="cyber-card p-6 text-center">
-              <div className="text-3xl font-bold neon-text-green mb-2 transition-all duration-300">
-                {displayStats.submissions}
+            <div className="cyber-card p-6 text-center relative">
+              <div className="text-4xl font-bold neon-text-green mb-2 transition-all duration-300">
+                {isLoading ? (
+                  <div className="animate-pulse">•••</div>
+                ) : (
+                  displayStats.submissions
+                )}
               </div>
-              <div className="text-sm text-gray-400 uppercase tracking-wider">Submissions</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Total Submissions</div>
+              {lastUpdated && !isLoading && (
+                <div className="text-xs text-green-500/70">
+                  Live • Updated {lastUpdated.toLocaleTimeString()}
+                </div>
+              )}
+              {isLoading && (
+                <div className="text-xs text-green-500/70 animate-pulse">
+                  Syncing...
+                </div>
+              )}
             </div>
             <div className="cyber-card p-6 text-center">
               <div className="text-3xl font-bold neon-text-orange mb-2">
                 {isConnected ? '◉' : '○'}
               </div>
-              <div className="text-sm text-gray-400 uppercase tracking-wider">
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">
                 {isConnected ? 'Connected' : 'Offline'}
+              </div>
+              <div className="text-xs text-orange-500/70">
+                {isConnected ? 'Intuition Testnet' : 'Connect Wallet'}
               </div>
             </div>
             <div className="cyber-card p-6 text-center">
               <div className="text-3xl font-bold neon-text-pink mb-2">∞</div>
-              <div className="text-sm text-gray-400 uppercase tracking-wider">Trust Network</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Trust Network</div>
+              <div className="text-xs text-pink-500/70 mb-2">
+                Global Knowledge Graph
+              </div>
               <button
                 onClick={addTestData}
-                className="mt-2 text-xs bg-pink-600 text-white px-2 py-1 rounded hover:bg-pink-700"
+                className="text-xs bg-pink-600/20 border border-pink-600/50 text-pink-400 px-3 py-1 rounded hover:bg-pink-600/30 transition-colors duration-200"
               >
-                Add Test Data
+                + Add Demo Data
               </button>
             </div>
           </div>
