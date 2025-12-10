@@ -44,6 +44,10 @@ interface CommunityStakingProps {
 }
 
 export function CommunityStaking({ submissions, bounties = [], onStakeUpdate }: CommunityStakingProps) {
+  console.log(`🏛️ CommunityStaking rendered with:`)
+  console.log(`   Submissions: ${submissions.length}`, submissions.map(s => ({ id: s.id, bountyId: s.bountyId, title: s.bountyTitle })))
+  console.log(`   Bounties: ${bounties.length}`, bounties.map(b => ({ id: b.id, title: b.title })))
+  
   const { address, isConnected, chainId } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
