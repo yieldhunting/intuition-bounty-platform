@@ -51,7 +51,43 @@ class GlobalDataManager {
     try {
       const response = await fetch(`${this.baseUrl}/api/global-data`)
       if (!response.ok) throw new Error('Failed to fetch global data')
-      return await response.json()
+      const data = await response.json()
+      
+      // Also fetch GraphQL data to get complete picture
+      try {
+        const { graphqlClient, GET_BOUNTIES_QUERY, transformAtomToBounty, groupSubmissionsByBounty } = await import('./graphql')
+        
+        const graphqlResponse = await graphqlClient.request(GET_BOUNTIES_QUERY, { limit: 50 })
+        const graphqlBounties = graphqlResponse.atoms
+          .map(transformAtomToBounty)
+          .filter((bounty: any) => bounty !== null)
+        
+        const graphqlSubmissions = groupSubmissionsByBounty(graphqlResponse.atoms)
+        const flatSubmissions = Object.values(graphqlSubmissions).flat()
+        
+        console.log('📊 GlobalData: Found', graphqlBounties.length, 'GraphQL bounties and', flatSubmissions.length, 'GraphQL submissions')
+        
+        // Combine with global storage data
+        return {
+          submissions: [...data.submissions, ...flatSubmissions.map((sub: any) => ({
+            id: sub.id || `graphql_${Date.now()}_${Math.random()}`,
+            bountyId: sub.bountyId,
+            bountyTitle: sub.title || 'GraphQL Submission',
+            submitterAddress: sub.submitter || 'Unknown',
+            portalUrl: sub.portalUrl || '',
+            submittedAt: sub.submittedAt || new Date().toISOString(),
+            forStake: '0',
+            againstStake: '0',
+            status: 'STAKING_PERIOD',
+            isLocal: false
+          }))],
+          bounties: [...data.bounties, ...graphqlBounties],
+          stakes: data.stakes
+        }
+      } catch (graphqlError) {
+        console.warn('Failed to fetch GraphQL data:', graphqlError)
+        return data
+      }
     } catch (error) {
       console.error('Error fetching global data:', error)
       return { submissions: [], bounties: [], stakes: {} }
