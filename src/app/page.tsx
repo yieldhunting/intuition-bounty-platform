@@ -58,15 +58,18 @@ export default function HomePage() {
     
     let messageIndex = 0
     let charIndex = 0
+    let fullText = ''
     
     const typeWriter = () => {
       if (messageIndex < messages.length) {
         const currentMessage = messages[messageIndex]
         if (charIndex < currentMessage.length) {
-          setTerminalText(prev => prev + currentMessage[charIndex])
+          fullText += currentMessage[charIndex]
+          setTerminalText(fullText)
           charIndex++
         } else {
-          setTerminalText(prev => prev + '\n')
+          fullText += '\n'
+          setTerminalText(fullText)
           messageIndex++
           charIndex = 0
         }
@@ -74,7 +77,9 @@ export default function HomePage() {
     }
     
     const interval = setInterval(typeWriter, 80)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+    }
   }, [])
 
   // FIXED: Counter animations with correct dependency array
@@ -163,12 +168,12 @@ export default function HomePage() {
             <div className="bg-black/40 border border-green-400/30 p-4 rounded font-mono text-sm">
               <div className="text-green-400">
                 <span className="text-green-300">root@intuition:</span>
-                <span className="text-white">~#</span>
+                <span className="text-white">~# </span>
               </div>
-              <pre className="text-green-300 whitespace-pre-wrap leading-relaxed mt-2">
+              <div className="text-green-300 whitespace-pre-wrap leading-relaxed mt-2">
                 {terminalText}
-              </pre>
-              <span className="inline-block w-2 h-4 bg-green-400 animate-pulse"></span>
+                <span className="inline-block w-2 h-4 bg-green-400 animate-pulse ml-1"></span>
+              </div>
             </div>
           </div>
 
