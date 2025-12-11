@@ -212,7 +212,7 @@ export default function Terminal() {
   )
 
   return (
-    <div className="min-h-screen scanlines cyber-grid">
+    <div className="min-h-screen scanlines">
       <CyberNav />
       {/* <VisitorStats /> - Temporarily disabled to test navigation */}
       
@@ -311,23 +311,8 @@ export default function Terminal() {
             <div className="cyber-card p-6 text-center">
               <div className="text-3xl font-bold neon-text-pink mb-2">∞</div>
               <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Trust Network</div>
-              <div className="text-xs text-pink-500/70 mb-2">
+              <div className="text-xs text-pink-500/70">
                 Global Knowledge Graph
-              </div>
-              <div className="space-y-2">
-                <button
-                  onClick={refreshStats}
-                  disabled={isLoading}
-                  className="text-xs bg-cyan-600/20 border border-cyan-600/50 text-cyan-400 px-3 py-1 rounded hover:bg-cyan-600/30 transition-colors duration-200 disabled:opacity-50"
-                >
-                  {isLoading ? 'Refreshing...' : '↻ Refresh Stats'}
-                </button>
-                <button
-                  onClick={addTestData}
-                  className="text-xs bg-pink-600/20 border border-pink-600/50 text-pink-400 px-3 py-1 rounded hover:bg-pink-600/30 transition-colors duration-200 block w-full"
-                >
-                  + Add Demo Data
-                </button>
               </div>
             </div>
           </div>
