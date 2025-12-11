@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { CyberNav } from '@/components/CyberNav'
+import { VisitorStats } from '@/components/VisitorStats'
 import { globalDataManager } from '@/lib/globalData'
 import Link from 'next/link'
 
@@ -181,6 +182,7 @@ export default function Terminal() {
   return (
     <div className="min-h-screen scanlines cyber-grid">
       <CyberNav />
+      <VisitorStats />
       
       <main className="pt-16 px-6 pb-12">
         <div className="max-w-6xl mx-auto">

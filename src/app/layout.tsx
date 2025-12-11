@@ -11,6 +11,19 @@ import type { Metadata } from 'next'
     description: 'Decentralized marketplace for data bounties',
   }
 
+  // Simple visitor tracking (logs to console in development)
+  const trackPageView = () => {
+    if (typeof window !== 'undefined') {
+      // Log page view with timestamp
+      console.log('Page view:', {
+        path: window.location.pathname,
+        timestamp: new Date().toISOString(),
+        referrer: document.referrer || 'direct',
+        userAgent: navigator.userAgent
+      })
+    }
+  }
+
   export default function RootLayout({
     children,
   }: {
