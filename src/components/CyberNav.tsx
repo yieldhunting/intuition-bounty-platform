@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 interface NavItem {
@@ -22,6 +23,16 @@ const navItems: NavItem[] = [
 
 export function CyberNav() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    // Allow default behavior for modifier keys (cmd/ctrl click for new tab)
+    if (e.metaKey || e.ctrlKey) return
+    
+    // Otherwise handle navigation programmatically
+    e.preventDefault()
+    router.push(path)
+  }
 
   return (
     <nav className="cyber-card border-b-2 border-cyan-400/30 backdrop-blur-md fixed top-0 left-0 right-0 z-[9999] pointer-events-auto">
@@ -45,6 +56,7 @@ export function CyberNav() {
                 <Link
                   key={item.path}
                   href={item.path}
+                  onClick={(e) => handleClick(e, item.path)}
                   className={`nav-link px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
@@ -75,6 +87,7 @@ export function CyberNav() {
                 <Link
                   key={item.path}
                   href={item.path}
+                  onClick={(e) => handleClick(e, item.path)}
                   className={`nav-link block px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
