@@ -166,7 +166,7 @@ body {
   background-size: 100% 3px;
   animation: scanline 2s linear infinite;
   pointer-events: none;
-  z-index: 1;
+  z-index: -1;
 }
 
 @keyframes scanline {
