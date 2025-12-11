@@ -174,28 +174,16 @@ body {
   100% { transform: translateY(100vh); }
 }
 
-/* Navigation button fixes */
-nav button {
+/* Navigation link fixes */
+nav a, .nav-link {
   cursor: pointer !important;
   pointer-events: auto !important;
-  border: none !important;
-  background: transparent !important;
-  outline: none !important;
+  display: inline-block;
+  text-decoration: none !important;
 }
 
-nav button:hover {
+nav a:hover, .nav-link:hover {
   cursor: pointer !important;
-}
-
-nav button:focus {
-  outline: none !important;
-}
-
-/* Ensure navigation buttons are clickable */
-.cyber-nav-button {
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+  text-decoration: none !important;
 }
 

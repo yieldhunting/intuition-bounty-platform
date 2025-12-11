@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useRouter } from 'next/navigation'
 
 interface NavItem {
   path: string
@@ -23,12 +22,6 @@ const navItems: NavItem[] = [
 
 export function CyberNav() {
   const pathname = usePathname()
-  const router = useRouter()
-
-  const handleNavigation = (path: string) => {
-    console.log('Navigating to:', path)
-    router.push(path)
-  }
 
   return (
     <nav className="cyber-card border-b-2 border-cyan-400/30 backdrop-blur-md fixed top-0 left-0 right-0 z-[9999] pointer-events-auto">
@@ -49,27 +42,18 @@ export function CyberNav() {
             {navItems.slice(1).map((item) => {
               const isActive = pathname === item.path
               return (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`cyber-nav-button px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 cursor-pointer border-none bg-transparent outline-none focus:outline-none hover:cursor-pointer ${
+                  href={item.path}
+                  className={`nav-link px-3 py-1 text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
                       : 'text-gray-400 hover:text-cyan-400 hover:bg-cyan-400/5 rounded'
                   }`}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.cursor = 'pointer'
-                  }}
                 >
                   <span className="mr-1">{item.icon}</span>
                   {item.label}
-                </button>
+                </Link>
               )
             })}
           </div>
@@ -88,27 +72,18 @@ export function CyberNav() {
             {navItems.slice(1).map((item) => {
               const isActive = pathname === item.path
               return (
-                <button
+                <Link
                   key={item.path}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`cyber-nav-button px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 cursor-pointer border-none bg-transparent block outline-none focus:outline-none hover:cursor-pointer ${
+                  href={item.path}
+                  className={`nav-link block px-2 py-1 text-xs font-medium uppercase tracking-wider text-center transition-all duration-300 ${
                     isActive
                       ? `${item.color} cyber-glow bg-cyan-400/10 border border-cyan-400/50 rounded`
                       : 'text-gray-400 hover:text-cyan-400 rounded'
                   }`}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    outline: 'none'
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.cursor = 'pointer'
-                  }}
                 >
                   <div>{item.icon}</div>
                   <div>{item.label}</div>
-                </button>
+                </Link>
               )
             })}
           </div>
