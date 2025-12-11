@@ -16,7 +16,25 @@ export default function Terminal() {
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
-  // Load global stats and refresh periodically
+  // Manual refresh function
+  const refreshStats = async () => {
+    setIsLoading(true)
+    try {
+      const globalData = await globalDataManager.fetchGlobalData()
+      const newStats = {
+        bounties: globalData.bounties?.length || 0,
+        submissions: globalData.submissions?.length || 0
+      }
+      setStats(newStats)
+      setLastUpdated(new Date())
+    } catch (error) {
+      console.error('❌ Error refreshing stats:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Load global stats once on mount
   useEffect(() => {
     const loadStats = async () => {
       try {
@@ -25,27 +43,41 @@ export default function Terminal() {
         const globalData = await globalDataManager.fetchGlobalData()
         console.log('📊 Raw global data:', globalData)
         
+        // Count only real bounties (not demo data)
+        const realBounties = globalData.bounties?.filter(b => !b.id.startsWith('demo_')) || []
+        const realSubmissions = globalData.submissions?.filter(s => !s.id.startsWith('demo_')) || []
+        
+        // Include demo data in total count for now since that's what users see
+        const totalBounties = globalData.bounties?.length || 0
+        const totalSubmissions = globalData.submissions?.length || 0
+        
         const newStats = {
-          bounties: globalData.bounties?.length || 0,
-          submissions: globalData.submissions?.length || 0
+          bounties: totalBounties,
+          submissions: totalSubmissions
         }
+        
+        console.log('📊 Stats breakdown:')
+        console.log('- Total bounties:', totalBounties)
+        console.log('- Real bounties:', realBounties.length) 
+        console.log('- Total submissions:', totalSubmissions)
+        console.log('- Real submissions:', realSubmissions.length)
         
         setStats(newStats)
         setLastUpdated(new Date())
         setIsLoading(false)
-        console.log('📊 Updated stats - Bounties:', newStats.bounties, 'Submissions:', newStats.submissions)
       } catch (error) {
         console.error('❌ Error loading stats:', error)
+        // Set fallback stats on error
+        setStats({ bounties: 0, submissions: 0 })
         setIsLoading(false)
       }
     }
     
-    // Load immediately
+    // Load stats once
     loadStats()
     
-    // Refresh every 10 seconds to keep stats current
-    const interval = setInterval(loadStats, 10000)
-    return () => clearInterval(interval)
+    // Refresh only when user manually triggers (you can add a refresh button later)
+    // No automatic interval refresh
   }, [])
 
   // Terminal animation effect
@@ -182,7 +214,7 @@ export default function Terminal() {
   return (
     <div className="min-h-screen scanlines cyber-grid">
       <CyberNav />
-      <VisitorStats />
+      {/* <VisitorStats /> - Temporarily disabled to test navigation */}
       
       <main className="pt-16 px-6 pb-12">
         <div className="max-w-6xl mx-auto">
@@ -282,12 +314,21 @@ export default function Terminal() {
               <div className="text-xs text-pink-500/70 mb-2">
                 Global Knowledge Graph
               </div>
-              <button
-                onClick={addTestData}
-                className="text-xs bg-pink-600/20 border border-pink-600/50 text-pink-400 px-3 py-1 rounded hover:bg-pink-600/30 transition-colors duration-200"
-              >
-                + Add Demo Data
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={refreshStats}
+                  disabled={isLoading}
+                  className="text-xs bg-cyan-600/20 border border-cyan-600/50 text-cyan-400 px-3 py-1 rounded hover:bg-cyan-600/30 transition-colors duration-200 disabled:opacity-50"
+                >
+                  {isLoading ? 'Refreshing...' : '↻ Refresh Stats'}
+                </button>
+                <button
+                  onClick={addTestData}
+                  className="text-xs bg-pink-600/20 border border-pink-600/50 text-pink-400 px-3 py-1 rounded hover:bg-pink-600/30 transition-colors duration-200 block w-full"
+                >
+                  + Add Demo Data
+                </button>
+              </div>
             </div>
           </div>
 
