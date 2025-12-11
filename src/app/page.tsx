@@ -11,6 +11,7 @@ export default function HomePage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [terminalText, setTerminalText] = useState('')
   const [stats, setStats] = useState({ bounties: 0, submissions: 0 })
+  const [displayStats, setDisplayStats] = useState({ bounties: 0, submissions: 0 })
   const [isLoading, setIsLoading] = useState(true)
   
   // Load global stats - THIS MIGHT BE THE CULPRIT
@@ -71,7 +72,34 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [])
 
-  // REMOVED: Complex counter animations - these were breaking navigation!
+  // FIXED: Counter animations with correct dependency array
+  useEffect(() => {
+    const animateCounter = (key: 'bounties' | 'submissions') => {
+      const start = displayStats[key]
+      const end = stats[key]
+      const duration = 1000 // 1 second animation
+      const startTime = Date.now()
+      
+      const updateCounter = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const current = Math.floor(start + (end - start) * progress)
+        
+        setDisplayStats(prev => ({ ...prev, [key]: current }))
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter)
+        }
+      }
+      
+      if (start !== end) {
+        updateCounter()
+      }
+    }
+    
+    animateCounter('bounties')
+    animateCounter('submissions')
+  }, [stats]) // ← FIXED: Only depend on stats, not displayStats!
 
   // QuickAction component with Next.js Link - SUSPECT THIS MIGHT BREAK NAV
   const QuickAction = ({ href, title, description, icon, color }: {
@@ -109,7 +137,7 @@ export default function HomePage() {
             Decentralized Bounty Intelligence Network
           </p>
           <p className="text-gray-300">
-            Testing navigation - removed counter animations, keeping scanlines to test which breaks it.
+            FIXED: Counter animations now work without breaking navigation!
           </p>
           <p className="text-cyan-400 mt-4">
             Wallet Status: {isConnected ? 'Connected' : 'Not Connected'}
@@ -119,14 +147,14 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="cyber-card p-4 text-center">
-              <div className="text-2xl font-bold neon-text-cyan">
-                {isLoading ? '...' : stats.bounties}
+              <div className="text-2xl font-bold neon-text-cyan transition-all duration-300">
+                {isLoading ? '...' : displayStats.bounties}
               </div>
               <div className="text-sm text-gray-400">Active Bounties</div>
             </div>
             <div className="cyber-card p-4 text-center">
-              <div className="text-2xl font-bold neon-text-green">
-                {isLoading ? '...' : stats.submissions}
+              <div className="text-2xl font-bold neon-text-green transition-all duration-300">
+                {isLoading ? '...' : displayStats.submissions}
               </div>
               <div className="text-sm text-gray-400">Total Submissions</div>
             </div>
