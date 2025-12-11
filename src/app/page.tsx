@@ -211,6 +211,40 @@ export default function Terminal() {
     </Link>
   )
 
+  // Debug click events on the homepage
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      console.log('🖱️ Click detected on homepage:', {
+        target: e.target,
+        currentTarget: e.currentTarget,
+        type: e.type,
+        button: e.button,
+        defaultPrevented: e.defaultPrevented
+      })
+    }
+
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (target.closest('a') || target.closest('.nav-link')) {
+        console.log('🔗 Link click detected:', {
+          element: target,
+          href: target.closest('a')?.getAttribute('href'),
+          defaultPrevented: e.defaultPrevented,
+          bubbles: e.bubbles,
+          cancelable: e.cancelable
+        })
+      }
+    }
+
+    document.addEventListener('click', handleClick, true) // Capture phase
+    document.addEventListener('click', handleLinkClick, false) // Bubble phase
+
+    return () => {
+      document.removeEventListener('click', handleClick, true)
+      document.removeEventListener('click', handleLinkClick, false)
+    }
+  }, [])
+
   return (
     <div className="min-h-screen scanlines">
       <CyberNav />
