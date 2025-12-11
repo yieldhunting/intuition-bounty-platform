@@ -48,10 +48,12 @@ export default function HomePage() {
   // Terminal animation effect
   useEffect(() => {
     const messages = [
-      'INITIALIZING BOUNTY BOARD...',
-      'CONNECTING TO INTUITION NETWORK...',
-      'LOADING DATA MARKETPLACE...',
-      'SYSTEM READY ◉',
+      'INITIALIZING BOUNTY MARKETPLACE...',
+      'CONNECTING TO INTUITION PROTOCOL...',
+      'SYNCING WITH BLOCKCHAIN NETWORK...',
+      'LOADING REAL-TIME DATA FEEDS...',
+      'ACTIVATING COMMUNITY VALIDATION...',
+      'BOUNTY BOARD ONLINE ✓'
     ]
     
     let messageIndex = 0
@@ -59,8 +61,9 @@ export default function HomePage() {
     
     const typeWriter = () => {
       if (messageIndex < messages.length) {
-        if (charIndex < messages[messageIndex].length) {
-          setTerminalText(prev => prev + messages[messageIndex][charIndex])
+        const currentMessage = messages[messageIndex]
+        if (charIndex < currentMessage.length) {
+          setTerminalText(prev => prev + currentMessage[charIndex])
           charIndex++
         } else {
           setTerminalText(prev => prev + '\n')
@@ -70,7 +73,7 @@ export default function HomePage() {
       }
     }
     
-    const interval = setInterval(typeWriter, 100)
+    const interval = setInterval(typeWriter, 80)
     return () => clearInterval(interval)
   }, [])
 
