@@ -48,7 +48,9 @@ export default function HomePage() {
   // Terminal animation effect
   useEffect(() => {
     const messages = [
-      'INITIALIZING INTUITION PROTOCOL...',
+      'INITIALIZING BOUNTY BOARD...',
+      'CONNECTING TO INTUITION NETWORK...',
+      'LOADING DATA MARKETPLACE...',
       'SYSTEM READY ◉',
     ]
     
@@ -130,62 +132,149 @@ export default function HomePage() {
       <CyberNav />
       <main className="pt-16 px-6 pb-12">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold neon-text-cyan cyber-glow font-orbitron mb-4">
-            INTUITION PROTOCOL
-          </h1>
-          <p className="text-cyan-300 text-lg font-rajdhani mb-8">
-            Decentralized Bounty Intelligence Network
-          </p>
-          <p className="text-gray-300">
-            FIXED: Counter animations now work without breaking navigation!
-          </p>
-          <p className="text-cyan-400 mt-4">
-            Wallet Status: {isConnected ? 'Connected' : 'Not Connected'}
-          </p>
-          <p className="text-green-400 mt-2">
-            Current Time: {currentTime.toLocaleTimeString()}
-          </p>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="cyber-card p-4 text-center">
-              <div className="text-2xl font-bold neon-text-cyan transition-all duration-300">
-                {isLoading ? '...' : displayStats.bounties}
+          {/* Terminal Header */}
+          <div className="cyber-card p-8 mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-4xl font-bold neon-text-cyan cyber-glow font-orbitron mb-2">
+                  INTUITION BOUNTY BOARD
+                </h1>
+                <p className="text-cyan-300 text-lg font-rajdhani">
+                  Decentralized Marketplace for Data Bounties
+                </p>
               </div>
-              <div className="text-sm text-gray-400">Active Bounties</div>
+              <div className="text-right">
+                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">
+                  SYSTEM TIME
+                </div>
+                <div className="text-cyan-400 font-mono">
+                  {currentTime.toLocaleTimeString()}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {currentTime.toLocaleDateString()}
+                </div>
+              </div>
             </div>
-            <div className="cyber-card p-4 text-center">
-              <div className="text-2xl font-bold neon-text-green transition-all duration-300">
-                {isLoading ? '...' : displayStats.submissions}
+
+            {/* Terminal Output */}
+            <div className="bg-black/40 border border-green-400/30 p-4 rounded font-mono text-sm">
+              <div className="text-green-400">
+                <span className="text-green-300">root@intuition:</span>
+                <span className="text-white">~#</span>
               </div>
-              <div className="text-sm text-gray-400">Total Submissions</div>
+              <pre className="text-green-300 whitespace-pre-wrap leading-relaxed mt-2">
+                {terminalText}
+              </pre>
+              <span className="inline-block w-2 h-4 bg-green-400 animate-pulse"></span>
             </div>
           </div>
-          <div className="mt-4 p-4 bg-black/40 border border-green-400/30 rounded font-mono text-sm">
-            <pre className="text-green-300 whitespace-pre-wrap">{terminalText}</pre>
+
+          {/* System Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="cyber-card p-6 text-center relative">
+              <div className="text-4xl font-bold neon-text-cyan mb-2 transition-all duration-300">
+                {isLoading ? (
+                  <div className="animate-pulse">•••</div>
+                ) : (
+                  displayStats.bounties
+                )}
+              </div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Active Bounties</div>
+              <div className="text-xs text-cyan-500/70">
+                Live Network Data
+              </div>
+            </div>
+            <div className="cyber-card p-6 text-center relative">
+              <div className="text-4xl font-bold neon-text-green mb-2 transition-all duration-300">
+                {isLoading ? (
+                  <div className="animate-pulse">•••</div>
+                ) : (
+                  displayStats.submissions
+                )}
+              </div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Total Submissions</div>
+              <div className="text-xs text-green-500/70">
+                Community Contributions
+              </div>
+            </div>
+            <div className="cyber-card p-6 text-center">
+              <div className="text-3xl font-bold neon-text-orange mb-2">
+                {isConnected ? '◉' : '○'}
+              </div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">
+                {isConnected ? 'Connected' : 'Offline'}
+              </div>
+              <div className="text-xs text-orange-500/70">
+                {isConnected ? 'Intuition Testnet' : 'Connect Wallet'}
+              </div>
+            </div>
+            <div className="cyber-card p-6 text-center">
+              <div className="text-3xl font-bold neon-text-pink mb-2">∞</div>
+              <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Trust Network</div>
+              <div className="text-xs text-pink-500/70">
+                Global Knowledge Graph
+              </div>
+            </div>
           </div>
           
-          {/* QuickAction Links - TESTING IF THESE BREAK NAVIGATION */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <QuickAction
               href="/discover"
               title="DISCOVER"
-              description="Explore active bounties from the Intuition Protocol network."
+              description="Explore active bounties from the Intuition Protocol network and find opportunities that match your expertise."
               icon="◎"
               color="neon-text-cyan"
             />
             <QuickAction
               href="/create"
               title="CREATE"
-              description="Deploy new data bounties to the network."
+              description="Deploy new data bounties to the network and incentivize the community to gather valuable information."
               icon="⬢"
               color="neon-text-green"
             />
             <QuickAction
               href="/validate"
               title="VALIDATE"
-              description="Stake on submissions and participate in validation."
+              description="Stake on submissions and participate in the community validation process to earn rewards."
               icon="⬡"
               color="neon-text-pink"
             />
+          </div>
+
+          {/* About Section */}
+          <div className="cyber-card p-8">
+            <h2 className="text-2xl font-bold neon-text-cyan mb-6 font-orbitron">
+              PROTOCOL OVERVIEW
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-semibold text-cyan-300 mb-3">NETWORK ARCHITECTURE</h3>
+                <p className="text-gray-300 leading-relaxed text-sm mb-4">
+                  A decentralized marketplace for data bounties, built natively on the Intuition Protocol.
+                  All bounties are atoms, all relationships are triples, and all settlements are in TRUST.
+                </p>
+                <ul className="text-sm text-gray-400 space-y-2">
+                  <li>• Blockchain-native bounty creation</li>
+                  <li>• Community-driven validation</li>
+                  <li>• Automated dispute resolution</li>
+                  <li>• Reputation-based scoring</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-cyan-300 mb-3">PROTOCOL IMPACT</h3>
+                <p className="text-gray-300 leading-relaxed text-sm mb-4">
+                  Every interaction contributes to the global Intuition knowledge graph and generates 
+                  protocol utilization, creating a self-reinforcing network of valuable data.
+                </p>
+                <div className="text-sm text-gray-400 space-y-2">
+                  <div>• Global knowledge graph expansion</div>
+                  <div>• Incentivized data collection</div>
+                  <div>• Trust-based validation mechanisms</div>
+                  <div>• Decentralized governance</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
