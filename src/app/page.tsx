@@ -1,8 +1,11 @@
 'use client'
 
+import { useAccount } from 'wagmi'
 import { CyberNav } from '@/components/CyberNav'
 
 export default function HomePage() {
+  const { isConnected } = useAccount()
+  
   return (
     <div className="min-h-screen">
       <CyberNav />
@@ -16,6 +19,9 @@ export default function HomePage() {
           </p>
           <p className="text-gray-300">
             Testing navigation - working simple version. Let me add features back step by step.
+          </p>
+          <p className="text-cyan-400 mt-4">
+            Wallet Status: {isConnected ? 'Connected' : 'Not Connected'}
           </p>
         </div>
       </main>
