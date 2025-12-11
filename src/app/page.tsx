@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { CyberNav } from '@/components/CyberNav'
 import { globalDataManager } from '@/lib/globalData'
+import Link from 'next/link'
 
 export default function HomePage() {
   const { isConnected } = useAccount()
@@ -69,6 +70,30 @@ export default function HomePage() {
     const interval = setInterval(typeWriter, 100)
     return () => clearInterval(interval)
   }, [])
+
+  // QuickAction component with Next.js Link - SUSPECT THIS MIGHT BREAK NAV
+  const QuickAction = ({ href, title, description, icon, color }: {
+    href: string
+    title: string
+    description: string
+    icon: string
+    color: string
+  }) => (
+    <Link href={href} className="group">
+      <div className="cyber-card p-6 h-full hover:bg-cyan-400/5 transition-all duration-300 group-hover:border-cyan-400">
+        <div className={`text-3xl mb-4 ${color}`}>{icon}</div>
+        <h3 className={`text-xl font-bold mb-2 ${color} cyber-glow group-hover:cyber-glow`}>
+          {title}
+        </h3>
+        <p className="text-gray-300 text-sm leading-relaxed">
+          {description}
+        </p>
+        <div className="mt-4 text-xs text-cyan-400 uppercase tracking-wider">
+          ACCESS →
+        </div>
+      </div>
+    </Link>
+  )
   
   return (
     <div className="min-h-screen">
@@ -106,6 +131,31 @@ export default function HomePage() {
           </div>
           <div className="mt-4 p-4 bg-black/40 border border-green-400/30 rounded font-mono text-sm">
             <pre className="text-green-300 whitespace-pre-wrap">{terminalText}</pre>
+          </div>
+          
+          {/* QuickAction Links - TESTING IF THESE BREAK NAVIGATION */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <QuickAction
+              href="/discover"
+              title="DISCOVER"
+              description="Explore active bounties from the Intuition Protocol network."
+              icon="◎"
+              color="neon-text-cyan"
+            />
+            <QuickAction
+              href="/create"
+              title="CREATE"
+              description="Deploy new data bounties to the network."
+              icon="⬢"
+              color="neon-text-green"
+            />
+            <QuickAction
+              href="/validate"
+              title="VALIDATE"
+              description="Stake on submissions and participate in validation."
+              icon="⬡"
+              color="neon-text-pink"
+            />
           </div>
         </div>
       </main>
