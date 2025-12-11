@@ -212,7 +212,7 @@ export default function Terminal() {
   )
 
   return (
-    <div className="min-h-screen scanlines">
+    <div className="min-h-screen">
       <CyberNav />
       {/* <VisitorStats /> - Temporarily disabled to test navigation */}
       
